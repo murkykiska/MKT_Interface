@@ -1,23 +1,11 @@
-﻿using Fluent;
-using MKT_Interface.Models;
+﻿using System;
+using Fluent;
 using MKT_Interface.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using WpfApp1.EM;
 
 namespace WpfApp1
 {
@@ -48,11 +36,15 @@ namespace WpfApp1
             reversexIntervals.ItemsSource = ViewModel.ReverseTask.XIntervals;
             reversezIntervals.ItemsSource = ViewModel.ReverseTask.ZIntervals;
             reverseAreas.ItemsSource = ViewModel.ReverseTask.Areas;
+
+            MagnetismManager.makeDirectTask(@"../../../DirectTask.cfg", -1000, 1000, 1000, "../../../Recs.txt");
+
         }
 
         private void createDirectCFG_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.DirectTask.PrintCFG("../../../DirectTask.cfg");
+
         }
 
         private void createReverseCFG_Click(object sender, RoutedEventArgs e)
