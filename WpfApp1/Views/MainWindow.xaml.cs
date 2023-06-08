@@ -59,6 +59,14 @@ namespace WpfApp1
         {
             ViewModel.ReverseTask.PrintCFG("../../../ReverseTask.cfg");
         }
+        private void EnterRecievers_Click(object sender, RoutedEventArgs e)
+        {
+            double leftX = double.Parse(receiverBegX.Text);
+            double rightX = double.Parse(receiverEndX.Text);
+            int n = int.Parse(receiverCount.Text);
+
+            //...
+        }
         public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

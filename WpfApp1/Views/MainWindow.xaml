@@ -232,16 +232,13 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Text="Начало" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverBegX" Grid.Row="0" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverBegY" Grid.Row="0" Grid.Column="2" Width ="60" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverBegZ" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
+                        <r:TextBox x:Name="receiverBegX" Grid.Row="0" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
                         <TextBlock Text="Конец" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverEndY" Grid.Row="1" Grid.Column="2" Width ="60" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverEndZ" Grid.Row="1" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
-                        <TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="4" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="receiverCount" Grid.Row="0" Grid.Column="5" Width ="60" Margin="10 10 0 0" />
-                        
+                        <r:TextBox x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
+                        <TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
+                        <r:TextBox x:Name="receiverCount" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
+                        <r:Button x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 0 0" Click="EnterRecievers_Click"/>
+
                     </Grid>
                 </r:RibbonGroupBox>
 
