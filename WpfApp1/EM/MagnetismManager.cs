@@ -11,9 +11,9 @@ public class MagnetismManager
 {
    public static void MakeDirect(string directtaskCfg, double leftX, double rightX, int i, string recsTxt)
    {
-      string direct = @"..\..\..\EM\direct.exe";
+      string direct = @"../../../EM/direct.exe";
 
-      using (StreamWriter s = new StreamWriter("..\\..\\..\\EM\\direct_info.txt", new FileStreamOptions{ Mode = FileMode.CreateNew }))
+      using (var s = new StreamWriter(@"../../../EM/direct_info.txt", new FileStreamOptions{ Mode = FileMode.OpenOrCreate }))
       {
          s.WriteLine(directtaskCfg);
          s.WriteLine(leftX);
