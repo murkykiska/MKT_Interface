@@ -57,7 +57,7 @@ namespace WpfApp1
 
         private void createReverseCFG_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.ReverseTask.PrintCFG("../../../DirectTask.cfg");
+            ViewModel.ReverseTask.PrintCFG("../../../ReverseTask.cfg");
         }
         public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
