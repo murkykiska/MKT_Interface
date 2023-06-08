@@ -223,7 +223,6 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
@@ -237,7 +236,7 @@
                         <r:TextBox x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
                         <TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
                         <r:TextBox x:Name="receiverCount" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
-                        <r:Button x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 0 0" Click="EnterRecievers_Click"/>
+                        <r:Button Header="Расчет прямой задачи" x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 0 0" Click="EnterRecievers_Click"/>
 
                     </Grid>
                 </r:RibbonGroupBox>
