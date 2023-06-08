@@ -37,8 +37,7 @@ namespace WpfApp1
             reversezIntervals.ItemsSource = ViewModel.ReverseTask.ZIntervals;
             reverseAreas.ItemsSource = ViewModel.ReverseTask.Areas;
 
-            MagnetismManager.makeDirectTask(@"../../../DirectTask.cfg", -1000, 1000, 1000, "../../../Recs.txt");
-
+            
         }
 
         private void createDirectCFG_Click(object sender, RoutedEventArgs e)
@@ -57,9 +56,10 @@ namespace WpfApp1
             double rightX = double.Parse(receiverEndX.Text);
             int n = int.Parse(receiverCount.Text);
 
-            //...
-        }
-        public event PropertyChangedEventHandler? PropertyChanged;
+         MagnetismManager.makeDirectTask(@"../../../DirectTask.cfg", leftX, rightX, n, "../../../Recs.txt");
+
+      }
+      public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
