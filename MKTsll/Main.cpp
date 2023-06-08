@@ -47,7 +47,7 @@ void writeInBinaryFileRecivers(double left, double right, int nRecivers, const M
 //}
 
 
-extern "C" _declspec(dllexport) void makeDirectTask(const char* cfgFileName, double left, double right, int nRecivers, const char* reciversFileName)
+void makeDirectTask(const char* cfgFileName, double left, double right, int nRecivers, const char* reciversFileName)
 {
 		libconfig::Config cfg;
 		getConfigFromFile(cfg, cfgFileName);
@@ -83,7 +83,7 @@ extern "C" _declspec(dllexport) void makeDirectTask(const char* cfgFileName, dou
 		out.close();
 }
 
-extern "C" _declspec(dllexport) void makeReverseTask(const char* cfgFileName, const char* reciversFileName, const char* ansFileName, double alpha)
+void makeReverseTask(const char* cfgFileName, const char* reciversFileName, const char* ansFileName, double alpha)
 {
 		libconfig::Config cfgRev;
 		getConfigFromFile(cfgRev, cfgFileName);
@@ -94,25 +94,35 @@ extern "C" _declspec(dllexport) void makeReverseTask(const char* cfgFileName, co
 		reverseTask.countSolution(recivers, meshRev);
 		meshRev.writeMagneticElementsInBinaryFile(ansFileName);
 }
-//int main()
+
+// make direct
+//int main(int argc, char* argv[])
 //{
-//	libconfig::Config cfg;
-//	getConfigFromFile(cfg, "DirectTask.cfg");
-//	MeshInfo mesh(cfg);
-//	MagnetismDirectTask directTask(mesh);
-//	writeInBinaryFileRecivers(-500, 500, 500, directTask, "ReciversData.bin");
-//	writeBInConsole(-500, 500, 500, directTask);
-//	libconfig::Config cfgRev;
-//	getConfigFromFile(cfgRev, "ReverseTask.cfg");
-//	MeshInfo meshRev(cfgRev);
-//	ReverseTask reverseTask(0);
-//	std::vector<Reciver> recivers;
-//	Reciver::readRecivers(recivers, "ReciversData.bin");
-//	reverseTask.countSolution(recivers, meshRev);
-//	for (const MagnetElement& elem : meshRev.getMagneticElements())
-//	{
-//		std::cout << elem.get_pX() << " " << elem.get_pZ() << std::endl;
-//	}
-//	
+//	std::ifstream in;
+//	in.open(argv[0]);
+//
+//	std::string cfg, recs;
+//	double left, right;
+//	int c;
+//
+//	in >> cfg >> left >> right >> c >> recs;
+//
+//	makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
 //	return 0;
 //}
+
+
+int main(int argc, char* argv[])
+{
+	
+	std::ifstream in;
+	in.open(argv[0]);
+
+	std::string cfg, recs, ans;
+	double alpha;
+
+	in >> cfg >> recs >> ans >> alpha;
+
+	makeReverseTask(cfg.c_str(), recs.c_str(), ans.c_str(), alpha );
+	return 0;
+}

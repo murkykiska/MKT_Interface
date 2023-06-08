@@ -1,15 +1,68 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 
 namespace WpfApp1.EM;
 
 public class MagnetismManager
 {
-   public MagnetismManager() {}
+   public static void MakeDirect(string directtaskCfg, double leftX, double rightX, int i, string recsTxt)
+   {
+      string direct = @"..\..\..\EM\direct.exe";
 
-   [DllImport("..\\..\\..\\MKT_Interface\\x64\\Release\\Modern_Computer_Technologies.dll")]
-   public static extern void makeDirectTask(string cfgFileName, double left, double right, int nRecivers, string reciversFileName);
+      using (StreamWriter s = new StreamWriter("..\\..\\..\\EM\\direct_info.txt", new FileStreamOptions{ Mode = FileMode.CreateNew }))
+      {
+         s.WriteLine(directtaskCfg);
+         s.WriteLine(leftX);
+         s.WriteLine(rightX);
+         s.WriteLine(i);
+         s.WriteLine(recsTxt);
+      }
 
-   [DllImport(@"..\..\..\EM\Modern Computer Technologies.dll")]
-   public static extern void makeReverseTask(string cfgFileName, string reciversFileName, string ansFileName, double alpha);
+      ProcessStartInfo info = new(direct, "direct_info.txt");
+      info.CreateNoWindow = true;
 
+      try
+      {
+         using (Process exeProcess = Process.Start(info))
+         {
+            exeProcess.WaitForExit();
+         }
+      }
+      catch
+      {
+         throw new Exception("Pepega");
+      }
+   }
+
+   public static void MakeReverse(string directtaskCfg, string recsTxt, string ansTxt, double alpha)
+   {
+      string reverse = @"..\..\..\EM\reverse.exe";
+
+      using (StreamWriter s = new StreamWriter("..\\..\\..\\EM\\reverse_info.txt", new FileStreamOptions(){Mode = FileMode.CreateNew}))
+      {
+         s.WriteLine(directtaskCfg);
+         s.WriteLine(recsTxt);
+         s.WriteLine(ansTxt);
+         s.WriteLine(alpha);
+      }
+
+      ProcessStartInfo info = new(reverse, "reverse_info.txt");
+      info.CreateNoWindow = true;
+
+      try
+      {
+         using (Process exeProcess = Process.Start(info))
+         {
+            exeProcess.WaitForExit();
+         }
+      }
+      catch
+      {
+         throw new Exception("agepeP");
+      }
+   }
 } 
