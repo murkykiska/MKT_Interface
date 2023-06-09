@@ -92,6 +92,10 @@ namespace WpfApp1;
       GL.Enable(EnableCap.DebugOutputSynchronous);
       GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
 
+      GL.Enable(EnableCap.Blend);
+      GL.Enable(EnableCap.LineSmooth);
+      GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
       Camera2D.Instance.Position.X = (float)gl.ActualWidth / 2f;
       Camera2D.Instance.Position.Y = (float)gl.ActualHeight / 2f;
       Camera2D.Instance.Position = -Vector3.UnitZ;
@@ -102,7 +106,7 @@ namespace WpfApp1;
          new TextParams()
          {
             Color = Color4.Chartreuse, FontSize = 14, TextFontFamily = System.Drawing.FontFamily.GenericMonospace,
-            TextFontStyle = System.Drawing.FontStyle.Strikeout
+            TextFontStyle = System.Drawing.FontStyle.Bold
          });
       tr.SetCoordinates((50, 50));
 
