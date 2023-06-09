@@ -104,7 +104,7 @@ namespace MKT_Interface.Models
                 writer.WriteLine($"\t\t\t\t\tSparseRatio = {XIntervals[0].SparseRatio}");
                 writer.WriteLine("\t\t\t\t}");
                 writer.WriteLine("\t\t\t\tPointNum1 = 0");
-                writer.WriteLine("\t\t\t\tPointNum1 = 1");
+                writer.WriteLine("\t\t\t\tPointNum2 = 1");
                 writer.WriteLine("\t\t\t}");
                 writer.WriteLine($"\t\t)");
 
@@ -117,7 +117,7 @@ namespace MKT_Interface.Models
                 writer.WriteLine($"\t\t\t\t\tSparseRatio = {ZIntervals[0].SparseRatio}");
                 writer.WriteLine("\t\t\t\t}");
                 writer.WriteLine("\t\t\t\tPointNum1 = 0");
-                writer.WriteLine("\t\t\t\tPointNum1 = 1");
+                writer.WriteLine("\t\t\t\tPointNum2 = 1");
                 writer.WriteLine("\t\t\t}");
                 writer.WriteLine($"\t\t)");
 
