@@ -1,1 +1,5 @@
-﻿
+C:\Users\pm82k\source\repos\MKT_Interface\WpfApp1\DirectTask.cfg
+123
+124
+12
+..\Recs.txt

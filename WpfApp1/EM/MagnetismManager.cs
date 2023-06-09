@@ -11,9 +11,10 @@ public class MagnetismManager
 {
    public static void MakeDirect(string directtaskCfg, double leftX, double rightX, int i, string recsTxt)
    {
-      string direct = @"../../../EM/direct.exe";
+      string direct = "..\\..\\..\\EM\\direct.exe";
+      string dinfo = "..\\..\\..\\EM\\direct_info.txt";
 
-      using (var s = new StreamWriter(@"../../../EM/direct_info.txt", new FileStreamOptions{ Mode = FileMode.OpenOrCreate }))
+      using (var s = new StreamWriter(dinfo))
       {
          s.WriteLine(directtaskCfg);
          s.WriteLine(leftX);
@@ -23,7 +24,7 @@ public class MagnetismManager
       }
 
       ProcessStartInfo info = new(direct, "direct_info.txt");
-      info.CreateNoWindow = true;
+      info.CreateNoWindow = false;
 
       try
       {

@@ -56,7 +56,7 @@ namespace WpfApp1
             double rightX = double.Parse(receiverEndX.Text);
             int n = int.Parse(receiverCount.Text);
 
-         MagnetismManager.MakeDirect(@"../../../DirectTask.cfg", leftX, rightX, n, "../../../Recs.txt");
+         MagnetismManager.MakeDirect("..\\DirectTask.cfg", leftX, rightX, n, "..\\Recs.txt");
 
       }
       public event PropertyChangedEventHandler? PropertyChanged;

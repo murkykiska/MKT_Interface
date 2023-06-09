@@ -49,7 +49,7 @@ libconfig::Config& getConfigFromFile(libconfig::Config& cfg, std::string_view co
 	}
 	catch (libconfig::ParseException& pex)
 	{
-		std::string exeptionMSG = "I / O error while reading file: ";
+		std::string exeptionMSG = "Parse error while reading file: ";
 		exeptionMSG.append(pex.getFile());
 		exeptionMSG.append(" in line :");
 		exeptionMSG.append(std::to_string(pex.getLine()));

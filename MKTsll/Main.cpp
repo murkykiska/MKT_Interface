@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "ReverseTask.h"
 
 void writeInBinaryFileRecivers(double left, double right, int nRecivers, const MagnetismDirectTask& dirctTask, std::string outFileName)
@@ -49,8 +51,16 @@ void writeInBinaryFileRecivers(double left, double right, int nRecivers, const M
 
 void makeDirectTask(const char* cfgFileName, double left, double right, int nRecivers, const char* reciversFileName)
 {
+
 		libconfig::Config cfg;
+	try
+	{
 		getConfigFromFile(cfg, cfgFileName);
+	}
+	catch (std::exception* e)
+	{
+		std::cout << e->what();
+	}
 		MeshInfo mesh(cfg);
 		MagnetismDirectTask directTask(mesh);
 		if (left > right)
@@ -58,11 +68,13 @@ void makeDirectTask(const char* cfgFileName, double left, double right, int nRec
 		int nIntervals = nRecivers - 1;
 		double h = (right - left) / nIntervals;
 		std::ofstream out;
+
 		out.open(reciversFileName, std::ios::binary);
 		out.write((char*)&nRecivers, sizeof(nRecivers));
 		double x;
 		double z = 0;
 		double bx, bz;
+
 		for (int i = 0; i < nIntervals; i++)
 		{
 			x = left + i * h;
@@ -73,6 +85,7 @@ void makeDirectTask(const char* cfgFileName, double left, double right, int nRec
 			out.write((char*)&bx, sizeof(bx));
 			out.write((char*)&bz, sizeof(bz));
 		}
+
 		x = right;
 		bx = directTask.calcMagneticIndoctionX(x, z);
 		bz = directTask.calcMagneticIndoctionY(x, z);
@@ -81,6 +94,7 @@ void makeDirectTask(const char* cfgFileName, double left, double right, int nRec
 		out.write((char*)&bx, sizeof(bx));
 		out.write((char*)&bz, sizeof(bz));
 		out.close();
+		
 }
 
 void makeReverseTask(const char* cfgFileName, const char* reciversFileName, const char* ansFileName, double alpha)
@@ -95,34 +109,47 @@ void makeReverseTask(const char* cfgFileName, const char* reciversFileName, cons
 		meshRev.writeMagneticElementsInBinaryFile(ansFileName);
 }
 
-// make direct
-//int main(int argc, char* argv[])
-//{
-//	std::ifstream in;
-//	in.open(argv[0]);
-//
-//	std::string cfg, recs;
-//	double left, right;
-//	int c;
-//
-//	in >> cfg >> left >> right >> c >> recs;
-//
-//	makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
-//	return 0;
-//}
-
-
+ //make direct
 int main(int argc, char* argv[])
 {
-	
 	std::ifstream in;
-	in.open(argv[0]);
+	in.open(argv[1]);
+	std::string cfg, recs;
+	double left, right;
+	int c;
+	
+	in >> cfg >> left >> right >> c >> recs;
+	std::cout << cfg << " " << left << " " << right << " " << c << " " << recs;
 
-	std::string cfg, recs, ans;
-	double alpha;
-
-	in >> cfg >> recs >> ans >> alpha;
-
-	makeReverseTask(cfg.c_str(), recs.c_str(), ans.c_str(), alpha );
+	try
+	{
+		makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what();
+	}
+	catch (std::exception* e)
+	{
+		std::cout << e->what();
+	}
+	
+	std::cout << "\nsuces";
 	return 0;
 }
+
+
+//int main(int argc, char* argv[])
+//{
+//	
+//	std::ifstream in;
+//	in.open(argv[1]);
+//	std::cout << argv[1];
+//	std::string cfg, recs, ans;
+//	double alpha;
+//
+//	in >> cfg >> recs >> ans >> alpha;
+//
+//	makeReverseTask(cfg.c_str(), recs.c_str(), ans.c_str(), alpha );
+//	return 0;
+//}
