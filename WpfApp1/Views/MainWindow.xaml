@@ -3,6 +3,7 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:glWpfControl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
                 xmlns:local="clr-namespace:WpfApp1"
                 mc:Ignorable="d"
                 xmlns:r="urn:fluent-ribbon"
@@ -19,7 +20,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <r:Ribbon Grid.Row="0">
+        <r:Ribbon Grid.Row="0" Grid.ColumnSpan="2">
             <r:RibbonTabItem Header="Прямая задача">
                 <r:RibbonGroupBox Header="Размеры">
                     <Grid>
@@ -274,5 +275,7 @@
                 </r:RibbonGroupBox>
             </r:RibbonTabItem>
         </r:Ribbon>
+
+		<glWpfControl:GLWpfControl x:Name="gl" Grid.Row="1" Margin="5,5,5,5" Render="gl_OnRender" Loaded="gl_Loaded" Unloaded="gl_Unloaded" SizeChanged="gl_SizeChanged"/>
     </Grid>
 </r:RibbonWindow>

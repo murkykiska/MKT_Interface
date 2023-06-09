@@ -27,6 +27,7 @@ public partial class Window : GameWindow
    {
       (Width, Height) = nativeWindowSettings.Size;
 
+
    }
 
    protected override void OnLoad()
@@ -111,13 +112,6 @@ public partial class Window : GameWindow
       base.OnLoad();
    }
 
-   protected override void OnMouseMove(MouseMoveEventArgs e)
-   {
-      base.OnMouseMove(e);
-      Title = (e.X - (Axis.Margin + Axis.TickMaxSize + PlotView.Instance.Margin.x0) - PlotView.Instance.Size.X / 2,
-         Size.Y - e.Y - (Axis.Margin + Axis.TickMaxSize + PlotView.Instance.Margin.y0) - PlotView.Instance.Size.Y / 2)
-         .ToString();
-   }
    
    protected override void OnResize(ResizeEventArgs e)
    {
@@ -125,7 +119,7 @@ public partial class Window : GameWindow
       //GL.Enable(EnableCap.ScissorTest);
       GL.Viewport(0, 0, e.Width, e.Height);
       camera.Size = e.Size;
-      PlotView.Instance.SetAxes(e.Size);
+      //PlotView.Instance.SetAxes(e.Size);
       base.OnResize(e);
    }
 
@@ -140,12 +134,12 @@ public partial class Window : GameWindow
 
       // Render plotview
       {
-         PlotView.Instance
-            .DrawPlotView(Size, () =>
-            {
-               FunctionManager.Instance.DrawFunctions();
-               DrawMouse();
-            });
+         //PlotView.Instance
+         //   .DrawPlotView(Size, () =>
+         //   {
+         //      FunctionManager.Instance.DrawFunctions();
+         //      DrawMouse();
+         //   });
       }
 
       //foreach (var textRenderer in _textRenderer)
@@ -159,35 +153,35 @@ public partial class Window : GameWindow
       base.OnRenderFrame(args);
    }
 
-   private void DrawMouse()
-   {
-      var vao = GL.GenVertexArray();
-      GL.BindVertexArray(vao);
+   //private void DrawMouse()
+   //{
+   //   var vao = GL.GenVertexArray();
+   //   GL.BindVertexArray(vao);
 
-      var vbo = GL.GenBuffer();
-      GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-      GL.BufferData(BufferTarget.ArrayBuffer, 8 * sizeof(float), new[]
-      {
-         -10000,
-         Size.Y-MousePosition.Y - PlotView.Instance.Size.Y / 2 - PlotView.Instance.Margin.y0 - Axis.Margin - Axis.TickMaxSize,
-         10000,
-         Size.Y-MousePosition.Y - PlotView.Instance.Size.Y / 2 - PlotView.Instance.Margin.y0 - Axis.Margin - Axis.TickMaxSize,
-         MousePosition.X - PlotView.Instance.Size.X / 2 - PlotView.Instance.Margin.x0 - Axis.Margin - Axis.TickMaxSize,
-         -10000,
-         MousePosition.X - PlotView.Instance.Size.X / 2 - PlotView.Instance.Margin.x0 - Axis.Margin - Axis.TickMaxSize,
-         10000,
-      }, BufferUsageHint.DynamicDraw);
-      GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
-      GL.EnableVertexAttribArray(0);
-      _mouseProgram.UseShaders();
+   //   var vbo = GL.GenBuffer();
+   //   GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+   //   GL.BufferData(BufferTarget.ArrayBuffer, 8 * sizeof(float), new[]
+   //   {
+   //      -10000,
+   //      Size.Y-MousePosition.Y - PlotView.Instance.Size.Y / 2 - PlotView.Instance.Margin.y0 - Axis.Margin - Axis.TickMaxSize,
+   //      10000,
+   //      Size.Y-MousePosition.Y - PlotView.Instance.Size.Y / 2 - PlotView.Instance.Margin.y0 - Axis.Margin - Axis.TickMaxSize,
+   //      MousePosition.X - PlotView.Instance.Size.X / 2 - PlotView.Instance.Margin.x0 - Axis.Margin - Axis.TickMaxSize,
+   //      -10000,
+   //      MousePosition.X - PlotView.Instance.Size.X / 2 - PlotView.Instance.Margin.x0 - Axis.Margin - Axis.TickMaxSize,
+   //      10000,
+   //   }, BufferUsageHint.DynamicDraw);
+   //   GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+   //   GL.EnableVertexAttribArray(0);
+   //   _mouseProgram.UseShaders();
 
-      var ortho = Camera2D.Instance.GetOrthoMatrix();
-      _mouseProgram.SetMatrix4("projection", ref ortho);
-      GL.DrawArrays(PrimitiveType.Lines, 0, 4);
+   //   var ortho = Camera2D.Instance.GetOrthoMatrix();
+   //   _mouseProgram.SetMatrix4("projection", ref ortho);
+   //   GL.DrawArrays(PrimitiveType.Lines, 0, 4);
 
-      GL.DeleteBuffer(vbo);
-      GL.DeleteVertexArray(vao);
-   }
+   //   GL.DeleteBuffer(vbo);
+   //   GL.DeleteVertexArray(vao);
+   //}
 
    protected override void OnUnload()
    {
@@ -196,16 +190,6 @@ public partial class Window : GameWindow
          textRenderer.Dispose();
       }
       base.OnUnload();
-   }
-   
-   protected override void OnKeyDown(KeyboardKeyEventArgs e)
-   {
-      if (e.Key == Keys.Space)
-      {
-         Axis.IsInside = !Axis.IsInside;
-         PlotView.Instance.SetAxes(Size);
-      }
-      base.OnKeyDown(e);
    }
 
    protected override void OnMouseEnter()

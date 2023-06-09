@@ -47,7 +47,7 @@ public class TextParams
 
    public string FontFileName =>
       new StringBuilder()
-         .Append("../../../Text/FontAtlases/")
+         .Append("../../../Plot/Text/FontAtlases/")
          .Append(TextFontFamily.Name).Append(" ")
          .Append(TextFontStyle.ToString()).Append(" ")
          .Append(FontSize.ToString()).Append(" ")
@@ -76,7 +76,7 @@ public class TextRenderer : IDisposable
 
    public TextRenderer(string? text = null, TextParams? @params = null)
    {
-      _shaderText = new ShaderProgram(new[] { @"Text/Shaders/text.vert", @"Text/Shaders/text.frag" },
+      _shaderText = new ShaderProgram(new[] { @"Plot/Text/Shaders/text.vert", @"Plot/Text/Shaders/text.frag" },
                                          new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
       _shaderText.LinkShaders();
 

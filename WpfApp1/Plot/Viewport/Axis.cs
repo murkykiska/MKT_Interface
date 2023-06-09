@@ -32,7 +32,7 @@ public class Axis
        _ticksNum = ticksNum;  
        _isX = isX;
 
-       _shader = new ShaderProgram(new[] { @"Viewport/Shaders/axis.frag", @"Viewport/Shaders/axis.vert" },
+       _shader = new ShaderProgram(new[] { @"Plot/Viewport/Shaders/axis.frag", @"Plot/Viewport/Shaders/axis.vert" },
           new[] { ShaderType.FragmentShader, ShaderType.VertexShader });
        _shader.LinkShaders();
 
@@ -52,7 +52,7 @@ public class Axis
            _vbo = GL.GenBuffer();
 
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-        GL.BufferData(BufferTarget.ArrayBuffer, _ticks.Length * sizeof(float), _ticks, BufferUsageHint.StreamDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, _ticks.Length * sizeof(float), _ticks, BufferUsageHint.StaticDraw);
         GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
         GL.EnableVertexAttribArray(0);
         GL.BindVertexArray(0);
