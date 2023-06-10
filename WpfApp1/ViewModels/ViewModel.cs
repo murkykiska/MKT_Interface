@@ -43,7 +43,7 @@ namespace MKT_Interface.ViewModels
                 OnPropertyChanged();
             }
         }
-        private void ReDrawPalette(double minValue, double maxValue, Color color1, Color color2)
+        public void ReDrawPalette(double minValue, double maxValue, Color color1, Color color2)
         {
             Palette = new Palette(minValue, maxValue, color1, color2);
         }
