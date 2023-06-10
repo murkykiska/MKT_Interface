@@ -16,6 +16,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Wpf;
 using Plot.Function;
 using Plot.Viewport;
+using System.Windows.Media;
 
 namespace WpfApp1;
 
