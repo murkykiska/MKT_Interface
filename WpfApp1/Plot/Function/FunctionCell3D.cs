@@ -3,11 +3,13 @@ using OpenTK.Mathematics;
 using Plot.Shader;
 using System.Linq;
 using System;
+using System.Windows.Xps;
+
 namespace Plot.Function;
 
 public class FunctionCell3D : IFunction
 {
-   private int _vao = 0, _vbo = 0, _ebo = 0;
+   private int _vao = 0, _vbo = 0;
 
    private Box2d[] _cells;
    private float[] _values;
@@ -18,11 +20,13 @@ public class FunctionCell3D : IFunction
 
    private ShaderProgram _shader, _shaderLine;
    private int _textureID;
-   private int tex_resolution;
+   private int tex_resolution = 16;
+   private int _vboV;
+   private int _vboMat;
 
    public FunctionCell3D()
    {
-      Prepare();
+     
    }
    public Box2 GetDomain()
    {
@@ -64,8 +68,7 @@ public class FunctionCell3D : IFunction
                                        new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
       _shaderLine.LinkShaders();
 
-      double scale = _values.Max() - _values.Min(), min = _values.Min();
-
+      _shader.UseShaders();
       if (_vao == 0)
          _vao = GL.GenVertexArray();
       GL.BindVertexArray(_vao);
@@ -74,39 +77,73 @@ public class FunctionCell3D : IFunction
          _vbo = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
-      for (int i = 0; i < _cells.Length * 2; i += 2)
       {
+         GL.BufferData(BufferTarget.ArrayBuffer, 8 * sizeof(float),
+            new[]
+            {
+               //x  y  us      
+               -1, -1,
+               1, -1,
+               -1, 1,
+               1, 1,
+            },
+            BufferUsageHint.StaticDraw);
 
-         if (_vao == 0 && _ebo == 0 && _vbo == 0)
-         {
-            _vao = GL.GenVertexArray();
-            GL.BindVertexArray(_vao);
+         GL.EnableVertexAttribArray(0);
+         GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0); // x y
+      }
 
-            _vbo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, 12 * sizeof(float),
-               new[]
-               {//x  y  us      
-                  _cells[i].Min.X, _cells[i].Min.Y, (min + _values[i]) / scale,
-                  _cells[i].Max.X, _cells[i].Min.Y, (min + _values[i]) / scale,
-                  _cells[i].Min.X, _cells[i].Max.X, (min + _values[i]) / scale,
-                  _cells[i].Max.X, _cells[i].Max.X, (min + _values[i]) / scale, 
-               },
-               BufferUsageHint.StaticDraw);
+      float scale = _values.Max() - _values.Min(), min = _values.Min();
+      if (scale == 0)
+         scale = 1f;
+      float[] vals = new float[_values.Length];
+      for (int i = 0; i < vals.Length; i++)
+         vals[i] = (min + _values[i]) / scale;
 
-            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); // x y
-            GL.EnableVertexAttribArray(0);
+      _mats = new Matrix4[_values.Length];
+      for (int i = 0; i < vals.Length; i++)
+      {
+         (double scalex, double scaley) = _cells[i].Size;
+         (double tx, double ty) = _cells[i].Center;
+         _mats[i] = Matrix4.CreateScale((float)scalex / 2f, (float)scaley / 2f, 1) * Matrix4.CreateTranslation((float)tx, (float)ty, 0);
+      }
 
-            GL.VertexAttribPointer(1, 1, VertexAttribPointerType.Float, false, 3 * sizeof(float), 2 * sizeof(float)); // x y
-            GL.EnableVertexAttribArray(1);
+      _vboV = GL.GenBuffer();
+      _vboMat = GL.GenBuffer();
+      {
+         GL.BindBuffer(BufferTarget.ArrayBuffer, _vboV);
+         GL.BufferData(BufferTarget.ArrayBuffer, vals.Length * sizeof(float), vals, BufferUsageHint.StaticDraw);
 
-            _ebo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, 4 * sizeof(uint), new uint[] { 0, 1, 2, 3 },
-               BufferUsageHint.StaticDraw);
+         GL.BindVertexArray(_vao);
+         GL.EnableVertexAttribArray(1);
+         GL.VertexAttribDivisor(1, 1);
+         GL.VertexAttribPointer(1, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
 
-            GL.BindVertexArray(0);
-         }
+
+         GL.BindBuffer(BufferTarget.ArrayBuffer, _vboMat);
+         GL.BufferData(BufferTarget.ArrayBuffer, _mats.Length * 16 * sizeof(float), _mats,
+            BufferUsageHint.StaticDraw);
+
+         int vec4Size = 4 * sizeof(float);
+
+         GL.EnableVertexAttribArray(2);
+         GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 4 * vec4Size, 0);
+         GL.EnableVertexAttribArray(3);
+         GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 4 * vec4Size, (1 * vec4Size));
+         GL.EnableVertexAttribArray(4);
+         GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 4 * vec4Size, (2 * vec4Size));
+         GL.EnableVertexAttribArray(5);
+         GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 4 * vec4Size, (3 * vec4Size));
+
+         GL.VertexAttribDivisor(2, 1);
+         GL.VertexAttribDivisor(3, 1);
+         GL.VertexAttribDivisor(4, 1);
+         GL.VertexAttribDivisor(5, 1);
+
+         var _ebo = GL.GenBuffer();
+         GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
+         GL.BufferData(BufferTarget.ElementArrayBuffer, 4 * sizeof(uint), new uint[] { 0, 1, 2, 3 },
+            BufferUsageHint.StreamDraw);
       }
 
       float[] texPixels = new float[3 * tex_resolution];
@@ -139,9 +176,7 @@ public class FunctionCell3D : IFunction
       GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
       GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
       GL.BindTexture(TextureTarget.Texture1D, 0);
-
-      GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
-
+      GL.BindVertexArray(0);
    }
 
    public Vector3 Color1 { get; set; }
@@ -151,20 +186,22 @@ public class FunctionCell3D : IFunction
    {
       _shader.UseShaders();
       var ortho = Camera2D.Instance.GetOrthoMatrix();
-      var model = Matrix4.CreateScale(DrawArea.Size.X, DrawArea.Size.Y, 1) * Matrix4.CreateTranslation(DrawArea.Center.X, DrawArea.Center.Y, 0);
+      var model = Matrix4.CreateTranslation(DrawArea.Center.X, DrawArea.Center.Y, 0);
       _shader.SetMatrix4("projection", ref ortho);
       _shader.SetMatrix4("model", ref model);
 
-      GL.LineWidth(8);
+      GL.LineWidth(3);
       GL.BindVertexArray(_vao);
-      GL.BindTexture(TextureTarget.Texture1D, 0);
-      GL.DrawArraysInstanced(PrimitiveType.TriangleStrip, 0, 4, _cells.Length);
+      GL.ActiveTexture(TextureUnit.Texture0);
+      GL.BindTexture(TextureTarget.Texture1D, _textureID);
+      GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
 
-      _shaderLine.UseShaders();
-      _shaderLine.SetMatrix4("projection", ref ortho);
-      _shaderLine.SetMatrix4("model", ref model);
-      _shaderLine.SetVec4("color", ref color);
-      GL.DrawArraysInstanced(PrimitiveType.LineLoop, 0, 4, _cells.Length);
+      //_shaderLine.UseShaders();
+      //_shaderLine.SetMatrix4("projection", ref ortho);
+      //_shaderLine.SetMatrix4("model", ref model);
+      //_shaderLine.SetVec4("color", ref color);
+      //GL.DrawElementsInstanced(PrimitiveType.LineLoop, 4, DrawElementsType.UnsignedInt, IntPtr.Zero, _cells.Length);
+      GL.BindVertexArray(0);
 
 
    }

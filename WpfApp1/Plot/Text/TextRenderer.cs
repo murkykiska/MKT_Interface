@@ -234,8 +234,6 @@ public class TextRenderer : IDisposable
 
       GL.BindVertexArray(_vaoText);
       GL.ActiveTexture(TextureUnit.Texture0);
-      //GL.BindTexture(TextureTarget.Texture2D, 0);
-      //GL.DrawElementsInstanced(PrimitiveType.LineStrip, 4, DrawElementsType.UnsignedInt, IntPtr.Zero, _text.Length);
       GL.BindTexture(TextureTarget.Texture2D, _textureID);
       GL.DrawElementsInstanced(PrimitiveType.TriangleStrip, 4, DrawElementsType.UnsignedInt, IntPtr.Zero, _text.Length);
       GL.BindVertexArray(0);
@@ -277,8 +275,6 @@ public class TextRenderer : IDisposable
 
       _shaderText.UseShaders();
       var uvs = new Vector2(u_step, v_step);
-      var ortho = camera.GetOrthoMatrix();
-      _shaderText.SetMatrix4("projection", ref ortho);
 
       // prepare instance
       if (_vaoText == 0 && _eboText == 0 && _vboText == 0)

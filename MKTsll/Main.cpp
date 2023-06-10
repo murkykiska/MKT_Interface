@@ -173,7 +173,7 @@ void makeReverseTask(const char* cfgFileName, const char* reciversFileName, cons
 
 }
 
-////make direct
+//make direct
 //int main(int argc, char* argv[])
 //{
 //	std::ifstream in;

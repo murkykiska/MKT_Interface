@@ -64,6 +64,7 @@ public class Axis
         var ortho = Camera2D.Instance.GetOrthoMatrix();
         _shader.SetMatrix4("projection", ref ortho);
         //_shader.SetMatrix4("transform", ref _transform);
+        GL.LineWidth(2);
 
         GL.BindVertexArray(_vao);
         GL.DrawArrays(PrimitiveType.Lines, 0, 2 * _ticksNum);

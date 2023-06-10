@@ -27,9 +27,9 @@ public class MagnetismManager
          s.WriteLine(recsTxt);
       }
 
-      ProcessStartInfo info = new(direct, "direct_info.txt");
+      ProcessStartInfo info = new(direct, "./direct_info.txt");
       info.CreateNoWindow = false;
-
+      info.WorkingDirectory = "./";
       try
       {
          using (Process exeProcess = Process.Start(info))
@@ -46,7 +46,7 @@ public class MagnetismManager
    {
       string reverse = @"..\..\..\EM\reverse.exe";
 
-      using (StreamWriter s = new StreamWriter("..\\..\\..\\EM\\reverse_info.txt", new FileStreamOptions(){Mode = FileMode.CreateNew}))
+      using (StreamWriter s = new StreamWriter("..\\..\\..\\EM\\reverse_info.txt"))
       {
          s.WriteLine(directtaskCfg);
          s.WriteLine(recsTxt);
@@ -54,7 +54,7 @@ public class MagnetismManager
          s.WriteLine(alpha);
       }
 
-      ProcessStartInfo info = new(reverse, "reverse_info.txt");
+      ProcessStartInfo info = new(reverse, "..\\..\\..\\EM\\reverse_info.txt");
       info.CreateNoWindow = true;
 
       try
@@ -88,14 +88,14 @@ public class MagnetismManager
    {
       var data = 
          from d in _data
-         where isX ? d.X == coord : d.Y == coord
+         where !isX ? d.X == coord : d.Y == coord
          orderby isX ? d.X : d.Y
          select d;
 
       var f = new Function2D();
-      Vector2[] func = new Vector2[data.Count()];
 
       var d_ = data.ToArray();
+      Vector2[] func = new Vector2[d_.Length];
       for (int i = 0; i < d_.Length; i++)
       {
          (float x, float y) xy = (isX ? (float)d_[i].X : (float)d_[i].Y, isX ? (float)d_[i].Z : (float)d_[i].W);
@@ -108,7 +108,7 @@ public class MagnetismManager
 
    public void GetTrueCells(string directtaskCfg, string ansTxt)
    {
-      string _true = @"..\..\..\EM\true.exe";
+      string _true = "..\\..\\..\\EM\\true.exe";
       string tinfo = "..\\..\\..\\EM\\true_info.txt";
 
       using (StreamWriter s = new StreamWriter(tinfo))
@@ -117,7 +117,7 @@ public class MagnetismManager
          s.WriteLine(ansTxt);
       }
 
-      ProcessStartInfo info = new(_true, "true_info.txt");
+      ProcessStartInfo info = new(_true, "..\\..\\..\\EM\\true_info.txt");
       info.CreateNoWindow = false;
 
       try

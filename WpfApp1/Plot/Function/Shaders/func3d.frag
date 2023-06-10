@@ -6,5 +6,5 @@ uniform sampler1D color;
 
 void main()
 {
-	FragColor = texture(color, val);
+	FragColor = vec4(0.5);// texture(color, val);
 }

@@ -10,7 +10,6 @@ void MagnetElement::writeInBinaryFile(std::ofstream& out) const
 	out.write((char*)&getIntervalX().getRightPoint(), sizeof(double));
 	out.write((char*)&getIntervalZ().getLeftPoint(), sizeof(double));
 	out.write((char*)&getIntervalZ().getRightPoint(), sizeof(double));
-	out.write((char*)&getIntervalX().getLeftPoint(), sizeof(double));
 	double px = get_pX();
 	double pz = get_pZ();
 	out.write((char*)&px, sizeof(double));

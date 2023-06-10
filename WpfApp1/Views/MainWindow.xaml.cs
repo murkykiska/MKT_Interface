@@ -4,6 +4,7 @@ using MKT_Interface.ViewModels;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using WpfApp1.EM;
 using OpenTK.Graphics.OpenGL4;
@@ -59,7 +60,9 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
       });
       GL.Enable(EnableCap.LineSmooth);
       GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 0, 10 });
-
+      GL.Enable(EnableCap.DebugOutput);
+      GL.Enable(EnableCap.DebugOutputSynchronous);
+      GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
       GL.LineWidth(1);
    }
 
@@ -76,10 +79,45 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
       MagnetismManager.MakeReverse("..\\DirectTask.cfg", "..\\Recs.txt", "..\\Cells.txt", double.Parse(Alpha.Text));
       manager.GetRecieverData("..\\..\\..\\Recs.txt");
       num_func = manager.GetRecieversDataOnPlane(true, 0);
+      num_func.Prepare();
 
       manager.ReadCells("..\\..\\..\\Cells.txt");
       cell_func = manager.GetMagnetismData(true);
-      viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
+      //cell_func.Prepare();
+
+      (double min, double max) = (num_func.GetDomain().Min.X, num_func.GetDomain().Max.X);
+      for (int i = 0; i < p1XVals.Length - 1; i++)
+      {
+         var ix = min + i * (max - min) / 8;
+         p1XVals[i].SetText(ix.ToString("g3"));
+      }
+      p1XVals[^1].SetText(max.ToString("g3"));
+
+      (min, max) = (num_func.GetDomain().Min.Y, num_func.GetDomain().Max.Y);
+      for (int i = 0; i < p1YVals.Length - 1; i++)
+      {
+         var iy = min + i * (max - min) / 8;
+         p1YVals[i].SetText(iy.ToString("g4"));
+      }
+      p1YVals[^1].SetText(max.ToString("g4"));
+
+      //(min, max) = (cell_func.GetDomain().Min.X, cell_func.GetDomain().Max.X);
+      //for (int i = 0; i < p2XVals.Length - 1; i++)
+      //{
+      //   var ix = min + i * (max - min) / 8;
+      //   p2XVals[i].SetText(ix.ToString("g3"));
+      //}
+      //p2XVals[^1].SetText(max.ToString("g3"));
+      //
+      //(min, max) = (cell_func.GetDomain().Min.Y, cell_func.GetDomain().Max.Y);
+      //for (int i = 0; i < p2YVals.Length - 1; i++)
+      //{
+      //   var iy = min + i * (max - min) / 8;
+      //   p2YVals[i].SetText(iy.ToString("g4"));
+      //}
+      //p2YVals[^1].SetText(max.ToString("g4"));
+
+      //viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
 
    }
    private void EnterRecievers_Click(object sender, RoutedEventArgs e)
@@ -92,11 +130,32 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
       manager.GetTrueCells("..\\DirectTask.cfg", "..\\CellsTrue.txt");
       manager.ReadCells("..\\..\\..\\CellsTrue.txt");
       cell_func = manager.GetMagnetismData(true);
-      viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
-
       cell_func.Color0 = (viewModel.Palette.Color1.R / 255f, viewModel.Palette.Color1.G / 255f, viewModel.Palette.Color1.B / 255f);
       cell_func.Color1 = (viewModel.Palette.Color2.R / 255f, viewModel.Palette.Color2.G / 255f, viewModel.Palette.Color2.B / 255f);
 
+      cell_func.Prepare();
+
+      (double min, double max) = (cell_func.GetDomain().Min.X, cell_func.GetDomain().Max.X);
+      for (int i = 0; i< p2XVals.Length - 1; i++)
+      {
+         var ix = min + i * (max - min) / 8;
+         p2XVals[i].SetText(ix.ToString("g3"));
+      }
+      p2XVals[^1].SetText(max.ToString("g3"));
+
+      (min, max) = (cell_func.GetDomain().Min.Y, cell_func.GetDomain().Max.Y);
+      for (int i = 0; i < p2YVals.Length - 1; i++)
+      {
+         var iy = min + i * (max - min) / 8;
+         p2YVals[i].SetText(iy.ToString("g4"));
+      }
+      p2YVals[^1].SetText(max.ToString("g4"));
+
+
+
+      viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
+
+ 
    }
    public event PropertyChangedEventHandler? PropertyChanged;
    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -204,7 +263,7 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
 
    private void gl_OnRender(TimeSpan delta)
    {
-      GL.ClearColor(Color4.Gray);
+      GL.ClearColor(Color4.White);
       GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
       if (gl.ActualWidth > 0 && gl.ActualHeight > 0 && axisNames != null)
@@ -228,8 +287,9 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
           });
          plotr?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
          {
-            cell_func?.Draw(Color4.Black, cell_func.GetDomain());
+            //cell_func?.Draw(Color4.Black, cell_func.GetDomain());
          });
+            //cell_func?.Draw(Color4.Black, cell_func.GetDomain());
       }
       //tr?.SetCoordinates(mouseCoords).SetText(mouseCoords.ToString()).DrawText(false);
       GL.Finish();
