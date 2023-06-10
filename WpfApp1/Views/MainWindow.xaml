@@ -212,6 +212,7 @@
                     </Grid>
                 </r:RibbonGroupBox>
                 <r:RibbonGroupBox>
+                    <r:Button Header="Load DirectTask values" x:Name="LoadDirectTaskValues" Width="50" Click="LoadDirectTaskValues_Click"/>
                     <r:Button Header="Create CFG" x:Name="createReverseCFG" Width="50" Click="createReverseCFG_Click"/>
                 </r:RibbonGroupBox>
                 <r:RibbonGroupBox Header="Регуляризация">
