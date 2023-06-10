@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using MKT_Interface.Models;
 using OpenTK.Mathematics;
 using Plot.Function;
 
@@ -10,6 +11,7 @@ namespace WpfApp1.EM;
 public class MagnetismManager
 {
    Vector4d[] _data;
+    Cell[] Cells;
    public static void MakeDirect(string directtaskCfg, double leftX, double rightX, int i, string recsTxt)
    {
       string direct = "..\\..\\..\\EM\\direct.exe";
@@ -102,4 +104,21 @@ public class MagnetismManager
       f.FillPoints(func);
       return f;
    }
+    public void ReadCells(string path)
+    {
+        int count;
+        
+        using (BinaryReader r = new BinaryReader(File.Open(path, FileMode.Open)))
+        {
+            count = r.ReadInt32();
+
+            Cells = new Cell[count];
+
+            for (int i = 0; i  <= count; i++)
+            {
+                Cells[i] = new Cell(r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble());
+            }
+        }
+    }
+
 } 
