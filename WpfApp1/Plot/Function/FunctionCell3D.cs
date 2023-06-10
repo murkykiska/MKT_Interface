@@ -13,11 +13,18 @@ public class FunctionCell3D : IFunction
    private float[] _values;
    private Matrix4[] _mats;
 
+   public float min => _values.Min();
+   public float max => _values.Max();
+
    private ShaderProgram _shader, _shaderLine;
    private int _textureID;
    private int tex_resolution;
 
-   public Box2d GetDomain()
+   public FunctionCell3D()
+   {
+      Prepare();
+   }
+   public Box2 GetDomain()
    {
       if (_cells == null)
          throw new Exception("FunctionCell3D was not defined!");
@@ -33,7 +40,7 @@ public class FunctionCell3D : IFunction
       var y = ys.ToArray();
       var x = xs.ToArray();
 
-      return new Box2d { Min = (x[0].Min.X, y[0].Min.Y), Max = (x[^1].Max.X, y[^1].Max.Y) };
+      return new Box2 { Min = ((float)x[0].Min.X, (float)y[0].Min.Y), Max = ((float)x[^1].Max.X, (float)y[^1].Max.Y) };
    }
 
    public void FillCells(Box2d[] cells, float[] values)
@@ -102,22 +109,16 @@ public class FunctionCell3D : IFunction
          }
       }
 
-
-      void MakeScaleTexture(ref float[] texPixels)
-      {
-         for (int i = 0; i < texPixels.Length / 3; i++)
-         {
-            float w = i / (texPixels.Length / 3f - 1f);
-
-            Vector3 color = Vector3.Lerp((0f, 0f, 0f), (1f, 1f, 1f), w);
-            texPixels[3 * i + 0] = color.X;
-            texPixels[3 * i + 1] = color.Y;
-            texPixels[3 * i + 2] = color.Z;
-         }
-      }
-
       float[] texPixels = new float[3 * tex_resolution];
-      MakeScaleTexture(ref texPixels);
+      for (int i = 0; i < texPixels.Length / 3; i++)
+      {
+         float w = i / (texPixels.Length / 3f - 1f);
+
+         Vector3 color = Vector3.Lerp(Color0, Color1, w);
+         texPixels[3 * i + 0] = color.X;
+         texPixels[3 * i + 1] = color.Y;
+         texPixels[3 * i + 2] = color.Z;
+      }
 
       _textureID = GL.GenTexture();
       //GL.ActiveTexture(TextureUnit.Texture0); // unnessessary
@@ -142,6 +143,10 @@ public class FunctionCell3D : IFunction
       GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
 
    }
+
+   public Vector3 Color1 { get; set; }
+   public Vector3 Color0 { get; set; }
+
    public void Draw(Color4 color, Box2 DrawArea)
    {
       _shader.UseShaders();

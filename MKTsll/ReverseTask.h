@@ -1,7 +1,7 @@
 #pragma once
 #include "MagnetismDirectTask.h"
 #include "Reciver.h"
-
+#include "DEFINES.h"
 class ReverseTask
 {
 private:

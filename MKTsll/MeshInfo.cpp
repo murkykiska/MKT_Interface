@@ -142,6 +142,9 @@ void MeshInfo::writeMagneticElementsInBinaryFile(std::string_view fileName) cons
 {
 	std::ofstream out;
 	out.open(fileName.data(), std::ios::binary);
+	int c = _magneticElements.size();
+	out.write((char*)&c, sizeof(c));
 	for (const MagnetElement& element : _magneticElements)
 		element.writeInBinaryFile(out);
+	out.close();
 }

@@ -106,6 +106,32 @@ public class MagnetismManager
       return f;
    }
 
+   public void GetTrueCells(string directtaskCfg, string ansTxt)
+   {
+      string _true = @"..\..\..\EM\true.exe";
+      string tinfo = "..\\..\\..\\EM\\true_info.txt";
+
+      using (StreamWriter s = new StreamWriter(tinfo))
+      {
+         s.WriteLine(directtaskCfg);
+         s.WriteLine(ansTxt);
+      }
+
+      ProcessStartInfo info = new(_true, "true_info.txt");
+      info.CreateNoWindow = false;
+
+      try
+      {
+         using (Process exeProcess = Process.Start(info))
+         {
+            exeProcess.WaitForExit();
+         }
+      }
+      catch
+      {
+         throw new Exception("PPGAEE");
+      }
+   }
    public FunctionCell3D GetMagnetismData(bool isX)
    {
 
@@ -134,7 +160,7 @@ public class MagnetismManager
 
             Cells = new Cell[count];
 
-            for (int i = 0; i  <= count; i++)
+            for (int i = 0; i  < count; i++)
             {
                 Cells[i] = new Cell(r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble());
             }

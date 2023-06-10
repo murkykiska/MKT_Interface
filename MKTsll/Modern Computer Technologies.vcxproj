@@ -145,6 +145,7 @@
     <ClCompile Include="AreaInfo.cpp" />
     <ClCompile Include="Faces.cpp" />
     <ClCompile Include="FiniteElement.cpp" />
+    <ClCompile Include="GausseIntegr.cpp" />
     <ClCompile Include="GausseSLAE_Solver.cpp" />
     <ClCompile Include="GeomElement.cpp" />
     <ClCompile Include="IntervalForSplit.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="IntervalXYZ.cpp" />
     <ClCompile Include="LibconfigDeluxe.cpp" />
     <ClCompile Include="MagnetElement.cpp" />
+    <ClCompile Include="MagnetIndocFunctor.cpp" />
     <ClCompile Include="MagnetInfo.cpp" />
     <ClCompile Include="MagnetismDirectTask.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -165,9 +167,11 @@
   <ItemGroup>
     <ClInclude Include="Area.h" />
     <ClInclude Include="AreaInfo.h" />
+    <ClInclude Include="DEFINES.h" />
     <ClInclude Include="DimenshionTemlate.h" />
     <ClInclude Include="Faces.h" />
     <ClInclude Include="FiniteElement.h" />
+    <ClInclude Include="GausseIntegr.h" />
     <ClInclude Include="GausseSLAE_Solver.h" />
     <ClInclude Include="GeomElement.h" />
     <ClInclude Include="InputData.h" />
@@ -176,6 +180,7 @@
     <ClInclude Include="IntervalsXYZ.h" />
     <ClInclude Include="LibconfigDeluxe.h" />
     <ClInclude Include="MagnetElement.h" />
+    <ClInclude Include="MagnetIndocFunctor.h" />
     <ClInclude Include="MagnetInfo.h" />
     <ClInclude Include="MagnetismDirectTask.h" />
     <ClInclude Include="MatrixVectorOperations.h" />

@@ -21,80 +21,98 @@ using System.Windows.Media;
 
 namespace WpfApp1;
 
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
- public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
- {
-     private ViewModel viewModel;
-     public ViewModel ViewModel
-     {
-         get { return viewModel; }
-         set
-         {
-             viewModel = value;
-             OnPropertyChanged(nameof(ViewModel));
-         }
-     }
-     public MainWindow()
-     {
-         InitializeComponent();
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
+{
+   private ViewModel viewModel;
+   public ViewModel ViewModel
+   {
+      get { return viewModel; }
+      set
+      {
+         viewModel = value;
+         OnPropertyChanged(nameof(ViewModel));
+      }
+   }
+   public MainWindow()
+   {
+      InitializeComponent();
 
-         ViewModel = new ViewModel();
-         directxIntervals.ItemsSource = ViewModel.DirectTask.XIntervals;
-         directzIntervals.ItemsSource = ViewModel.DirectTask.ZIntervals;
-         directAreas.ItemsSource = ViewModel.DirectTask.Areas;
+      ViewModel = new ViewModel();
+      directxIntervals.ItemsSource = ViewModel.DirectTask.XIntervals;
+      directzIntervals.ItemsSource = ViewModel.DirectTask.ZIntervals;
+      directAreas.ItemsSource = ViewModel.DirectTask.Areas;
 
-         reversexIntervals.ItemsSource = ViewModel.ReverseTask.XIntervals;
-         reversezIntervals.ItemsSource = ViewModel.ReverseTask.ZIntervals;
-         reverseAreas.ItemsSource = ViewModel.ReverseTask.Areas;
+      reversexIntervals.ItemsSource = ViewModel.ReverseTask.XIntervals;
+      reversezIntervals.ItemsSource = ViewModel.ReverseTask.ZIntervals;
+      reverseAreas.ItemsSource = ViewModel.ReverseTask.Areas;
 
-         gl.Start(new GLWpfControlSettings()
-         {
-            MajorVersion = 4,
-            MinorVersion = 5,
-            GraphicsProfile = ContextProfile.Core,
-         });
-         GL.Enable(EnableCap.LineSmooth);
-         GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 0, 10 });
+      manager = new MagnetismManager();
 
-         GL.LineWidth(1);
+      gl.Start(new GLWpfControlSettings()
+      {
+         MajorVersion = 4,
+         MinorVersion = 5,
+         GraphicsProfile = ContextProfile.Core,
+      });
+      GL.Enable(EnableCap.LineSmooth);
+      GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 0, 10 });
+
+      GL.LineWidth(1);
    }
 
-     private void createDirectCFG_Click(object sender, RoutedEventArgs e)
-     {
-         ViewModel.DirectTask.PrintCFG("../../../DirectTask.cfg");
+   private void createDirectCFG_Click(object sender, RoutedEventArgs e)
+   {
+      ViewModel.DirectTask.PrintCFG("../../../DirectTask.cfg");
 
-     }
+   }
 
-     private void createReverseCFG_Click(object sender, RoutedEventArgs e)
-     {
-         ViewModel.ReverseTask.PrintCFG("../../../ReverseTask.cfg");
-     }
-     private void EnterRecievers_Click(object sender, RoutedEventArgs e)
-     {
-         double leftX = double.Parse(receiverBegX.Text);
-         double rightX = double.Parse(receiverEndX.Text);
-         int n = int.Parse(receiverCount.Text);
+   private void createReverseCFG_Click(object sender, RoutedEventArgs e)
+   {
+      ViewModel.ReverseTask.PrintCFG("../../../ReverseTask.cfg");
+
+      MagnetismManager.MakeReverse("..\\DirectTask.cfg", "..\\Recs.txt", "..\\Cells.txt", double.Parse(Alpha.Text));
+      manager.GetRecieverData("..\\..\\..\\Recs.txt");
+      num_func = manager.GetRecieversDataOnPlane(true, 0);
+
+      manager.ReadCells("..\\..\\..\\Cells.txt");
+      cell_func = manager.GetMagnetismData(true);
+      viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
+
+   }
+   private void EnterRecievers_Click(object sender, RoutedEventArgs e)
+   {
+      double leftX = double.Parse(receiverBegX.Text);
+      double rightX = double.Parse(receiverEndX.Text);
+      int n = int.Parse(receiverCount.Text);
 
       MagnetismManager.MakeDirect("..\\DirectTask.cfg", leftX, rightX, n, "..\\Recs.txt");
+      manager.GetTrueCells("..\\DirectTask.cfg", "..\\CellsTrue.txt");
+      manager.ReadCells("..\\..\\..\\CellsTrue.txt");
+      cell_func = manager.GetMagnetismData(true);
+      viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
 
+      cell_func.Color0 = (viewModel.Palette.Color1.R / 255f, viewModel.Palette.Color1.G / 255f, viewModel.Palette.Color1.B / 255f);
+      cell_func.Color1 = (viewModel.Palette.Color2.R / 255f, viewModel.Palette.Color2.G / 255f, viewModel.Palette.Color2.B / 255f);
 
    }
    public event PropertyChangedEventHandler? PropertyChanged;
-     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-     {
-         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-     }
+   protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+   {
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+   }
 
-#region GL
+   #region GL
 
-   private Function2D true_func, num_func;
+   private MagnetismManager manager;
+   private Function2D num_func;
    private FunctionCell3D cell_func;
-    private PlotView plotl, plotr;
-    private TextRenderer[] axisNames, p1XVals, p1YVals, p2XVals, p2YVals;
-    private void gl_Loaded(object sender, RoutedEventArgs e)
-    {
+   private PlotView plotl, plotr;
+   private TextRenderer[] axisNames, p1XVals, p1YVals, p2XVals, p2YVals;
+   private void gl_Loaded(object sender, RoutedEventArgs e)
+   {
       GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
       GL.Enable(EnableCap.DebugOutput);
       GL.Enable(EnableCap.DebugOutputSynchronous);
@@ -166,7 +184,7 @@ namespace WpfApp1;
                .SetCoordinates((p1x0 - Axis.TickMaxSize - (tparams.FontSize - tparams.CharXSpacing) * "0.0E-0".Length, p1y0 + p1vy * i));
 
             p2XVals[i] = new TextRenderer("0.0E-0", tparams)
-               .SetCoordinates((p2x0 + p2vx * i - 10, 
+               .SetCoordinates((p2x0 + p2vx * i - 10,
                                    p2y0 - Axis.TickMaxSize - tparams.FontSize - 2));
             p2YVals[i] = new TextRenderer("0.0E-0", tparams)
                .SetCoordinates((p1x1 + plotl.Margin.x0 + 2, p2y0 + p2vy * i));
@@ -176,22 +194,23 @@ namespace WpfApp1;
       var s = ((int)gl.ActualWidth, (int)gl.ActualHeight);
       plotl?.SetAxes(s);
       plotr?.SetAxes(s);
-    }
+   }
 
-    private void LoadDirectTaskValues_Click(object sender, RoutedEventArgs e)
-    {
+   private void LoadDirectTaskValues_Click(object sender, RoutedEventArgs e)
+   {
 
-    }
 
-    private void gl_OnRender(TimeSpan delta)
-    {
-       GL.ClearColor(Color4.Gray);
-       GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-    
-       if (gl.ActualWidth > 0 && gl.ActualHeight > 0 && axisNames != null)
-       {
-          foreach (var axisName in axisNames)
-             axisName.DrawText(false);
+   }
+
+   private void gl_OnRender(TimeSpan delta)
+   {
+      GL.ClearColor(Color4.Gray);
+      GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+      if (gl.ActualWidth > 0 && gl.ActualHeight > 0 && axisNames != null)
+      {
+         foreach (var axisName in axisNames)
+            axisName.DrawText(false);
 
          foreach (var x in p1XVals)
             x.DrawText(false);
@@ -205,80 +224,81 @@ namespace WpfApp1;
 
          plotl?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
           {
-               
+             num_func?.Draw(Color4.HotPink, num_func.GetDomain());
           });
-          plotr?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
-          {
+         plotr?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
+         {
+            cell_func?.Draw(Color4.Black, cell_func.GetDomain());
+         });
+      }
+      //tr?.SetCoordinates(mouseCoords).SetText(mouseCoords.ToString()).DrawText(false);
+      GL.Finish();
+   }
+   private void gl_SizeChanged(object sender, SizeChangedEventArgs e)
+   {
 
-          });
-       }
-       //tr?.SetCoordinates(mouseCoords).SetText(mouseCoords.ToString()).DrawText(false);
-       GL.Finish();
-    }
-    private void gl_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-    
-       var s = ((int)e.NewSize.Width, (int)e.NewSize.Height);
-       GL.Viewport(0,0, s.Item1, s.Item2);
-       Camera2D.Instance.Size = s;
-       plotl?.SetAxes(s);
-       plotr?.SetAxes(s);
+      var s = ((int)e.NewSize.Width, (int)e.NewSize.Height);
+      GL.Viewport(0, 0, s.Item1, s.Item2);
+      Camera2D.Instance.Size = s;
+      plotl?.SetAxes(s);
+      plotr?.SetAxes(s);
 
-       if (plotl is null) return;
-         plotl.Margin = (20, (int)gl.ActualWidth / 2 - 30, 30, 30);
-       if (plotr is not null) 
-          plotr.Margin = (20 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30);
+      if (plotl is null) return;
+      plotl.Margin = (20, (int)gl.ActualWidth / 2 - 30, 30, 30);
+      if (plotr is not null)
+         plotr.Margin = (20 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30);
 
-       int p1x0 = plotl.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
-          p1x1 = p1x0 + plotl.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
+      int p1x0 = plotl.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
+         p1x1 = p1x0 + plotl.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
 
-          p1y0 = plotl.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
-          p1y1 = p1y0 - (plotl.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
+         p1y0 = plotl.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
+         p1y1 = p1y0 - (plotl.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
 
-       int p2x0 = plotr.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
-          p2x1 = p2x0 + plotr.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
+      int p2x0 = plotr.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
+         p2x1 = p2x0 + plotr.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
 
-          p2y0 = plotr.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
-          p2y1 = p2y0 - (plotr.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
-
-
-       axisNames[0].SetCoordinates((p1x0 - Axis.TickMaxSize, p1y1 + 2));
-       axisNames[1].SetCoordinates((p1x1 + 2, p1y0 - (float)axisNames[1].Params.FontSize / 2));
-       axisNames[2].SetCoordinates((p2x0 - Axis.TickMaxSize, p2y1 + 2));
-       axisNames[3].SetCoordinates((p2x1 + 2, p2y0 - (float)axisNames[3].Params.FontSize / 2));
-
-       for (int i = 0; i < 9; i++)
-       {
-          float p1vx = (p1x1 - p1x0) / 8;
-          float p1vy = (p1y1 - p1y0) / 8;
-
-          float p2vx = (p2x1 - p2x0) / 8;
-          float p2vy = (p2y1 - p2y0) / 8;
+         p2y0 = plotr.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
+         p2y1 = p2y0 - (plotr.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
 
 
-          p1XVals[i].SetCoordinates((p1x0 + p1vx * i - 10,
-                p1y0 - Axis.TickMaxSize - p2XVals[i].Params.FontSize - 2));
-          p1YVals[i]
-             .SetCoordinates((p1x0 - Axis.TickMaxSize - (p1YVals[i].Params.FontSize - p1YVals[i].Params.CharXSpacing) * "0.0E-0".Length, p1y0 + p1vy * i));
+      axisNames[0].SetCoordinates((p1x0 - Axis.TickMaxSize, p1y1 + 2));
+      axisNames[1].SetCoordinates((p1x1 + 2, p1y0 - (float)axisNames[1].Params.FontSize / 2));
+      axisNames[2].SetCoordinates((p2x0 - Axis.TickMaxSize, p2y1 + 2));
+      axisNames[3].SetCoordinates((p2x1 + 2, p2y0 - (float)axisNames[3].Params.FontSize / 2));
+
+      for (int i = 0; i < 9; i++)
+      {
+         float p1vx = (p1x1 - p1x0) / 8;
+         float p1vy = (p1y1 - p1y0) / 8;
+
+         float p2vx = (p2x1 - p2x0) / 8;
+         float p2vy = (p2y1 - p2y0) / 8;
+
+
+         p1XVals[i].SetCoordinates((p1x0 + p1vx * i - 10,
+               p1y0 - Axis.TickMaxSize - p2XVals[i].Params.FontSize - 2));
+         p1YVals[i]
+            .SetCoordinates((p1x0 - Axis.TickMaxSize - (p1YVals[i].Params.FontSize - p1YVals[i].Params.CharXSpacing) * "0.0E-0".Length, p1y0 + p1vy * i));
 
 
          p2XVals[i].SetCoordinates((p2x0 + p2vx * i - 10,
                 p2y0 - Axis.TickMaxSize - p2XVals[i].Params.FontSize - 2));
-          p2YVals[i].SetCoordinates((p1x1 + plotl.Margin.x0 + 2, p2y0 + p2vy * i));
+         p2YVals[i].SetCoordinates((p1x1 + plotl.Margin.x0 + 2, p2y0 + p2vy * i));
 
-       }
+      }
    }
-    private void gl_Unloaded(object sender, RoutedEventArgs e)
-    {
+   private void gl_Unloaded(object sender, RoutedEventArgs e)
+   {
 
-    }
+   }
 
-    private Vector2 mouseCoords;
-    private void Gl_OnMouseMove(object sender, MouseEventArgs e)
-    {
-       var pos = e.GetPosition(sender as IInputElement);
-       mouseCoords = ( (int) (pos.X - gl.ActualWidth / 2), (int) (gl.ActualHeight / 2 - pos.Y));
-    }
-    
-     #endregion
- }
+   private Vector2 mouseCoords;
+   private void Gl_OnMouseMove(object sender, MouseEventArgs e)
+   {
+      var pos = e.GetPosition(sender as IInputElement);
+      mouseCoords = ((int)(pos.X - gl.ActualWidth / 2), (int)(gl.ActualHeight / 2 - pos.Y));
+   }
+
+   #endregion
+
+}

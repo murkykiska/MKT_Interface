@@ -1,6 +1,7 @@
 #include "ReverseTask.h"
 #include "MatrixVectorOperations.h"
 #include "GausseSLAE_Solver.h"
+#include "GausseIntegr.h"
 
 const double PI = 3.14159265358979323846;
 
@@ -55,8 +56,48 @@ void ReverseTask::calcL(std::vector<std::vector<double>>& L, const std::vector<R
 	{
 		const Reciver& reciver = _recivers[iReciver];
 		for (int jElem = 0, j = 0; jElem < magneticElements.size(); jElem++, j += 2)
-		{
-			const MagnetElement& elem = magneticElements[jElem];
+		{			
+			const MagnetElement& elem = magneticElements[jElem];			
+#ifdef GAUSSE_COUNT			
+			double x = reciver.getX();
+			double z = reciver.getZ();
+			
+			xMidElem = (elem.getIntervalX().getLeftPoint() + elem.getIntervalX().getRightPoint()) / 2;
+			zMidElem = (elem.getIntervalZ().getLeftPoint() + elem.getIntervalZ().getRightPoint()) / 2;
+			double r2 = pow(x - xMidElem, 2) + pow(z - zMidElem, 2);
+
+			double elemDiag2 = pow(elem.getIntervalX().getLength(), 2) * pow(elem.getIntervalZ().getLength(), 2);
+
+			if (elemDiag2 / r2 > 0.1)
+			{
+				MagnetElement elemCopy = elem;
+				elemCopy.set_pX(1);
+				elemCopy.set_pZ(0);
+				MagnetIndocFunctorX magIndocFunctorX(x, z, mesh.getI(), elemCopy);
+				MagnetIndocFunctorZ magIndocFunctorZ(x, z, mesh.getI(), elemCopy);
+				L[i    ][j    ] = GausseIntegr::integrate(elem.getIntervalX().getLeftPoint(), elem.getIntervalX().getRightPoint(), elem.getIntervalZ().getLeftPoint(), elem.getIntervalZ().getRightPoint(), magIndocFunctorX);				
+				L[i + 1][j    ] = GausseIntegr::integrate(elem.getIntervalX().getLeftPoint(), elem.getIntervalX().getRightPoint(), elem.getIntervalZ().getLeftPoint(), elem.getIntervalZ().getRightPoint(), magIndocFunctorZ);
+				elemCopy.set_pX(0);
+				elemCopy.set_pZ(1);
+				L[i    ][j + 1] = GausseIntegr::integrate(elem.getIntervalX().getLeftPoint(), elem.getIntervalX().getRightPoint(), elem.getIntervalZ().getLeftPoint(), elem.getIntervalZ().getRightPoint(), magIndocFunctorX);
+				L[i + 1][j + 1] = GausseIntegr::integrate(elem.getIntervalX().getLeftPoint(), elem.getIntervalX().getRightPoint(), elem.getIntervalZ().getLeftPoint(), elem.getIntervalZ().getRightPoint(), magIndocFunctorZ);
+			}		
+			else
+			{
+				//xMidElem = (elem.getIntervalX().getLeftPoint() + elem.getIntervalX().getRightPoint()) / 2;
+				//zMidElem = (elem.getIntervalZ().getLeftPoint() + elem.getIntervalZ().getRightPoint()) / 2;
+				x_ = reciver.getX() - xMidElem;
+				z_ = reciver.getZ() - zMidElem;
+				//r2 = x_ * x_ + z_ * z_;
+				r3 = pow(sqrt(r2), 3);
+				coeff = elem.getSquare() * mesh.getI() / 4 / PI / r3;
+				L[i][j] = coeff * (3 * x_ * x_ / r2 - 1);
+				L[i][j + 1] = coeff * (3 * x_ * z_ / r2);
+				L[i + 1][j] = coeff * (3 * x_ * z_ / r2);
+				L[i + 1][j + 1] = coeff * (3 * z_ * z_ / r2 - 1);
+			}
+
+#else			
 			xMidElem = (elem.getIntervalX().getLeftPoint() + elem.getIntervalX().getRightPoint()) / 2;
 			zMidElem = (elem.getIntervalZ().getLeftPoint() + elem.getIntervalZ().getRightPoint()) / 2;
 			x_ = reciver.getX() - xMidElem;
@@ -64,10 +105,12 @@ void ReverseTask::calcL(std::vector<std::vector<double>>& L, const std::vector<R
 			r2 = x_ * x_ + z_ * z_;
 			r3 = pow(sqrt(r2), 3);
 			coeff = elem.getSquare() * mesh.getI() / 4 / PI / r3;
-			L[i    ][j    ] = coeff*(3 * x_ * x_ / r2 - 1);
+
+			L[i    ][j    ] = coeff* (3 * x_ * x_ / r2 - 1);
 			L[i    ][j + 1] = coeff * (3 * x_ * z_ / r2);
 			L[i + 1][j    ] = coeff * (3 * x_ * z_ / r2);
 			L[i + 1][j + 1] = coeff * (3 * z_ * z_ / r2 - 1);
+#endif
 		}
 	}
 }
