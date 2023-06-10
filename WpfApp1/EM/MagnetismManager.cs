@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using MKT_Interface.Models;
+using MKT_Interface.ViewModels;
 using OpenTK.Mathematics;
 using Plot.Function;
 
@@ -104,6 +105,25 @@ public class MagnetismManager
       f.FillPoints(func);
       return f;
    }
+
+   public FunctionCell3D GetMagnetismData(bool isX)
+   {
+
+      var f = new FunctionCell3D();
+      Box2d[] area = new Box2d[Cells.Length];
+      float[] vals = new float[Cells.Length];
+
+      for (int i = 0; i < Cells.Length; i++)
+      {
+         area[i] = new Box2d((Cells[i].X0, Cells[i].Z0), (Cells[i].X1, Cells[i].Z1));
+         vals[i] = (float)(isX ? Cells[i].PX : Cells[i].PZ);
+      }
+
+      f.FillCells(area, vals);
+
+      return f;
+   }
+
     public void ReadCells(string path)
     {
         int count;

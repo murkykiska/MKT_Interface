@@ -79,6 +79,7 @@ namespace WpfApp1;
 
       MagnetismManager.MakeDirect("..\\DirectTask.cfg", leftX, rightX, n, "..\\Recs.txt");
 
+
    }
    public event PropertyChangedEventHandler? PropertyChanged;
      protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -86,8 +87,10 @@ namespace WpfApp1;
          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
      }
 
-     #region GL
+#region GL
 
+   private Function2D true_func, num_func;
+   private FunctionCell3D cell_func;
     private PlotView plotl, plotr;
     private TextRenderer[] axisNames, p1XVals, p1YVals, p2XVals, p2YVals;
     private void gl_Loaded(object sender, RoutedEventArgs e)
@@ -105,8 +108,8 @@ namespace WpfApp1;
       Camera2D.Instance.Position.Y = (float)gl.ActualHeight / 2f;
       Camera2D.Instance.Position = -Vector3.UnitZ;
 
-      plotl = new PlotView { Margin = (10, (int)gl.ActualWidth / 2 - 30, 30, 30) };
-      plotr = new PlotView { Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30) };
+      plotl = new PlotView { Margin = (20, (int)gl.ActualWidth / 2 - 30, 30, 30) };
+      plotr = new PlotView { Margin = (20 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30) };
       Axis.TickMaxSize = 15;
 
       {
@@ -217,9 +220,9 @@ namespace WpfApp1;
        plotr?.SetAxes(s);
 
        if (plotl is null) return;
-         plotl.Margin = (10, (int)gl.ActualWidth / 2 - 30, 30, 30);
+         plotl.Margin = (20, (int)gl.ActualWidth / 2 - 30, 30, 30);
        if (plotr is not null) 
-          plotr.Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30);
+          plotr.Margin = (20 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30);
 
        int p1x0 = plotl.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
           p1x1 = p1x0 + plotl.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
