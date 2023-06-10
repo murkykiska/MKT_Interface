@@ -17,7 +17,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Wpf;
 using Plot.Function;
 using Plot.Viewport;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using System.Windows.Media;
 
 namespace WpfApp1;
 
