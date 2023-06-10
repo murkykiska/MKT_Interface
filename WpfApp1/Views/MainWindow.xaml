@@ -237,41 +237,22 @@
                         <r:TextBox x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
                         <TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
                         <r:TextBox x:Name="receiverCount" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
-                        <r:Button Header="Расчет прямой задачи" x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 0 0" Click="EnterRecievers_Click"/>
-
                     </Grid>
                 </r:RibbonGroupBox>
 
-                <r:RibbonGroupBox Header="Параметры зашумления">
+                <r:RibbonGroupBox Header="Регуляризация">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Шум" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="noisePercent" Grid.Row="0" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
-                        <TextBlock Text="%" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
-                        <TextBlock Text="Вероятность выброса" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="outlierProbabilityPercent" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
-                        <TextBlock Text="%" Grid.Row="1" Grid.Column="2" Margin="10 10 0 0" />
-                        <TextBlock Text="Амплитуда выброса" Grid.Row="0" Grid.Column="3" Margin="10 10 0 0" />
-                        <r:Spinner x:Name="outlierAmplitudePercent" Grid.Row="0" Grid.Column="4" Width ="60" Margin="10 10 0 0" />
-                        <TextBlock Text="%" Grid.Row="0" Grid.Column="5" Margin="10 10 0 0" />
+                        <TextBlock Text="Alpha" Grid.Column="0" Margin="10" />
+                        <r:TextBox x:Name="Alpha" Grid.Column="1" Margin="10" Width="70"/>
                     </Grid>
                 </r:RibbonGroupBox>
-
-                <r:RibbonGroupBox Header="Параметры сплайна">
-
+                <r:RibbonGroupBox>
+                    <r:Button Header="Расчет прямой задачи" x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 0 0" Click="EnterRecievers_Click"/>
                 </r:RibbonGroupBox>
             </r:RibbonTabItem>
         </r:Ribbon>
