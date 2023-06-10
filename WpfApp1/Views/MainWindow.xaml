@@ -257,6 +257,11 @@
             </r:RibbonTabItem>
         </r:Ribbon>
 
-		<glWpfControl:GLWpfControl x:Name="gl" Grid.Row="1" Margin="5,5,5,5" Render="gl_OnRender" Loaded="gl_Loaded" Unloaded="gl_Unloaded" SizeChanged="gl_SizeChanged"/>
+		<glWpfControl:GLWpfControl x:Name="gl" Grid.Row="1" Margin="5,5,5,5" 
+		                           Render="gl_OnRender" 
+		                           Loaded="gl_Loaded" 
+		                           Unloaded="gl_Unloaded" 
+		                           SizeChanged="gl_SizeChanged"
+		                           MouseMove="Gl_OnMouseMove"/>
     </Grid>
 </r:RibbonWindow>

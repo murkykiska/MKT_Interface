@@ -72,6 +72,7 @@ public class TextRenderer : IDisposable
    
    private string _text;
    private TextParams _params;
+   public TextParams Params => _params;
    private int _textureWidth, _textureHeight;
    private Vector2? _coords;
    private Matrix4[] _textMats;
@@ -214,7 +215,6 @@ public class TextRenderer : IDisposable
          PrepareText();
       return this;
    }
-
    public TextRenderer SetColor(Color4 color)
    {
       _params.Color = color;
@@ -270,7 +270,7 @@ public class TextRenderer : IDisposable
          float v = (idx / Settings.GlyphsPerLine) * v_step;
 
          _textMats[n] = Matrix4.CreateScale(_params.GlyphHeight)//(_params.FontSize) 
-                        * Matrix4.CreateTranslation(c.X + _params.GlyphWidth * n, c.Y, 0);//_params.CharXSpacing * n, c.Y, 0);
+                        * Matrix4.CreateTranslation(c.X + (_params.GlyphWidth - _params.CharXSpacing) * n, c.Y, 0);//_params.CharXSpacing * n, c.Y, 0);
          _textUVs[n] = new Vector2(u, v);
 
       }
@@ -307,7 +307,7 @@ public class TextRenderer : IDisposable
          _eboText = GL.GenBuffer();
          GL.BindBuffer(BufferTarget.ElementArrayBuffer, _eboText);
          GL.BufferData(BufferTarget.ElementArrayBuffer, 4 * sizeof(uint), new uint[] { 0, 1, 2, 3 },
-            BufferUsageHint.StaticDraw);
+            BufferUsageHint.StreamDraw);
 
          GL.BindVertexArray(0);
       }
@@ -321,7 +321,7 @@ public class TextRenderer : IDisposable
       // prepare per instance
       {
          GL.BindBuffer(BufferTarget.ArrayBuffer, _vboUV);
-         GL.BufferData(BufferTarget.ArrayBuffer, _textUVs.Length * 2 * sizeof(float), _textUVs, BufferUsageHint.StaticDraw);
+         GL.BufferData(BufferTarget.ArrayBuffer, _textUVs.Length * 2 * sizeof(float), _textUVs, BufferUsageHint.StreamDraw);
 
          GL.BindVertexArray(_vaoText);
          GL.EnableVertexAttribArray(3);

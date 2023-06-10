@@ -8,6 +8,7 @@ using System.Windows;
 using WpfApp1.EM;
 using OpenTK.Graphics.OpenGL4;
 using System.Text;
+using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using MeshVisualizator;
 using OpenTK.Mathematics;
@@ -16,6 +17,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Wpf;
 using Plot.Function;
 using Plot.Viewport;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace WpfApp1;
 
@@ -87,7 +89,7 @@ namespace WpfApp1;
      #region GL
 
     private PlotView plotl, plotr;
-    private TextRenderer tr;
+    private TextRenderer[] axisNames, p1XVals, p1YVals, p2XVals, p2YVals;
     private void gl_Loaded(object sender, RoutedEventArgs e)
     {
       GL.DebugMessageCallback(DebugMessageDelegate, IntPtr.Zero);
@@ -103,14 +105,71 @@ namespace WpfApp1;
       Camera2D.Instance.Position.Y = (float)gl.ActualHeight / 2f;
       Camera2D.Instance.Position = -Vector3.UnitZ;
 
-      plotl = new PlotView { Margin = (10, (int)gl.ActualWidth / 2 - 20, 10, 10) };
-      plotr = new PlotView { Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 20, 10, 10) };
-      tr = new TextRenderer("Huy",  new TextParams()
+      plotl = new PlotView { Margin = (10, (int)gl.ActualWidth / 2 - 30, 30, 30) };
+      plotr = new PlotView { Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30) };
+      Axis.TickMaxSize = 15;
+
+      {
+         int p1x0 = plotl.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
+            p1x1 = p1x0 + plotl.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
+
+            p1y0 = plotl.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
+            p1y1 = p1y0 - (plotl.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
+
+         int p2x0 = plotr.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
+            p2x1 = p2x0 + plotr.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
+
+            p2y0 = plotr.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
+            p2y1 = p2y0 - (plotr.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
+
+         var axistparams = new TextParams()
          {
-            Color = Color4.Chartreuse, FontSize = 14, TextFontFamily = System.Drawing.FontFamily.GenericMonospace,
-            TextFontStyle = System.Drawing.FontStyle.Bold
-         });
-      tr.SetCoordinates((0, 20));
+            Color = Color4.Black,
+            FontSize = 14,
+            TextFontFamily = System.Drawing.FontFamily.GenericMonospace,
+            CharXSpacing = 6
+         };
+         var tparams = new TextParams()
+         {
+            Color = Color4.Black,
+            FontSize = 8,
+            TextFontFamily = System.Drawing.FontFamily.GenericMonospace,
+            CharXSpacing = 3,
+         };
+         axisNames = new[]
+         {
+            new TextRenderer("Bz", axistparams).SetCoordinates((p1x0 - Axis.TickMaxSize, p1y1 + 2)),
+            new TextRenderer("X", axistparams).SetCoordinates((p1x1 + 2, p1y0 - (float)axistparams.FontSize / 2)),
+            new TextRenderer("Z", axistparams).SetCoordinates((p2x0 - Axis.TickMaxSize, p2y1 + 2)),
+            new TextRenderer("X", axistparams).SetCoordinates((p2x1 + 2, p2y0 - (float)axistparams.FontSize / 2)),
+         };
+         p1XVals = new TextRenderer[9];
+         p1YVals = new TextRenderer[9];
+         p2XVals = new TextRenderer[9];
+         p2YVals = new TextRenderer[9];
+
+         for (int i = 0; i < 9; i++)
+         {
+            float p1vx = (p1x1 - p1x0) / 8f;
+            float p1vy = (p1y1 - p1y0) / 8f;
+
+            float p2vx = (p2x1 - p2x0) / 8f;
+            float p2vy = (p2y1 - p2y0) / 8f;
+
+            p1XVals[i] = new TextRenderer("0.0E-0", tparams)
+               .SetCoordinates((p1x0 + p1vx * i - 10,
+                                   p1y0 - Axis.TickMaxSize - tparams.FontSize - 2));
+            p1YVals[i] = new TextRenderer("0.0E-0", tparams)
+               .SetCoordinates((p1x0 - Axis.TickMaxSize - (tparams.FontSize - tparams.CharXSpacing) * "0.0E-0".Length, p1y0 + p1vy * i));
+
+            p2XVals[i] = new TextRenderer("0.0E-0", tparams)
+               .SetCoordinates((p2x0 + p2vx * i - 10, 
+                                   p2y0 - Axis.TickMaxSize - tparams.FontSize - 2));
+            p2YVals[i] = new TextRenderer("0.0E-0", tparams)
+               .SetCoordinates((p1x1 + plotl.Margin.x0 + 2, p2y0 + p2vy * i));
+
+         }
+      }
       var s = ((int)gl.ActualWidth, (int)gl.ActualHeight);
       plotl?.SetAxes(s);
       plotr?.SetAxes(s);
@@ -121,9 +180,22 @@ namespace WpfApp1;
        GL.ClearColor(Color4.Gray);
        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
     
-       if (gl.ActualWidth > 0 && gl.ActualHeight > 0)
+       if (gl.ActualWidth > 0 && gl.ActualHeight > 0 && axisNames != null)
        {
-          plotl?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
+          foreach (var axisName in axisNames)
+             axisName.DrawText(false);
+
+         foreach (var x in p1XVals)
+            x.DrawText(false);
+         foreach (var x in p1YVals)
+            x.DrawText(false);
+         foreach (var x in p2XVals)
+            x.DrawText(false);
+         foreach (var x in p2YVals)
+            x.DrawText(false);
+
+
+         plotl?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
           {
                
           });
@@ -132,7 +204,7 @@ namespace WpfApp1;
 
           });
        }
-       tr?.DrawText(true);
+       //tr?.SetCoordinates(mouseCoords).SetText(mouseCoords.ToString()).DrawText(false);
        GL.Finish();
     }
     private void gl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -143,15 +215,62 @@ namespace WpfApp1;
        Camera2D.Instance.Size = s;
        plotl?.SetAxes(s);
        plotr?.SetAxes(s);
-    
-       if (plotl is not null) plotl.Margin = (10, (int)gl.ActualWidth / 2 - 10, 10, 10);
-       if (plotr is not null) plotr.Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 10, 10, 10);
-    }
+
+       if (plotl is null) return;
+         plotl.Margin = (10, (int)gl.ActualWidth / 2 - 30, 30, 30);
+       if (plotr is not null) 
+          plotr.Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 40, 30, 30);
+
+       int p1x0 = plotl.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
+          p1x1 = p1x0 + plotl.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
+
+          p1y0 = plotl.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
+          p1y1 = p1y0 - (plotl.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
+
+       int p2x0 = plotr.Margin.x0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualWidth / 2,
+          p2x1 = p2x0 + plotr.Margin.x1 - Axis.Margin - Axis.TickMaxSize,
+
+          p2y0 = plotr.Margin.y0 + Axis.Margin + Axis.TickMaxSize - (int)gl.ActualHeight / 2,
+          p2y1 = p2y0 - (plotr.Margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize + (int)gl.ActualHeight;
+
+
+       axisNames[0].SetCoordinates((p1x0 - Axis.TickMaxSize, p1y1 + 2));
+       axisNames[1].SetCoordinates((p1x1 + 2, p1y0 - (float)axisNames[1].Params.FontSize / 2));
+       axisNames[2].SetCoordinates((p2x0 - Axis.TickMaxSize, p2y1 + 2));
+       axisNames[3].SetCoordinates((p2x1 + 2, p2y0 - (float)axisNames[3].Params.FontSize / 2));
+
+       for (int i = 0; i < 9; i++)
+       {
+          float p1vx = (p1x1 - p1x0) / 8;
+          float p1vy = (p1y1 - p1y0) / 8;
+
+          float p2vx = (p2x1 - p2x0) / 8;
+          float p2vy = (p2y1 - p2y0) / 8;
+
+
+          p1XVals[i].SetCoordinates((p1x0 + p1vx * i - 10,
+                p1y0 - Axis.TickMaxSize - p2XVals[i].Params.FontSize - 2));
+          p1YVals[i]
+             .SetCoordinates((p1x0 - Axis.TickMaxSize - (p1YVals[i].Params.FontSize - p1YVals[i].Params.CharXSpacing) * "0.0E-0".Length, p1y0 + p1vy * i));
+
+
+         p2XVals[i].SetCoordinates((p2x0 + p2vx * i - 10,
+                p2y0 - Axis.TickMaxSize - p2XVals[i].Params.FontSize - 2));
+          p2YVals[i].SetCoordinates((p1x1 + plotl.Margin.x0 + 2, p2y0 + p2vy * i));
+
+       }
+   }
     private void gl_Unloaded(object sender, RoutedEventArgs e)
     {
 
     }
-     
 
+    private Vector2 mouseCoords;
+    private void Gl_OnMouseMove(object sender, MouseEventArgs e)
+    {
+       var pos = e.GetPosition(sender as IInputElement);
+       mouseCoords = ( (int) (pos.X - gl.ActualWidth / 2), (int) (gl.ActualHeight / 2 - pos.Y));
+    }
+    
      #endregion
-}
+ }
