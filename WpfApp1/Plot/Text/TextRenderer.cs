@@ -4,10 +4,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using MeshVisualizator;
 using OpenTK.Mathematics;
-using PlotTest.Shader;
+using Plot.Shader;
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 using ShaderType = OpenTK.Graphics.OpenGL4.ShaderType;
 
@@ -29,8 +30,8 @@ public enum TextAlignment
 
 static class Settings
 {
-   public static int GlyphHeight = 64;
-   public static int GlyphWidth = 64;
+   //public static int GlyphHeight = 64;
+   //public static int GlyphWidth = 64;
    public static int GlyphsPerLine = 16;
    public static int GlyphLineCount = 16;
    public static int AtlasOffsetX = -3, AtlasOffsetY = -4;
@@ -45,13 +46,15 @@ public class TextParams
    public int FontSize;
    public int CharXSpacing = 11;
 
+   public int GlyphWidth => (int)MathF.Pow(MathF.Ceiling(MathF.Log(FontSize, 2)), 2);
+   public int GlyphHeight => GlyphWidth;
    public string FontFileName =>
       new StringBuilder()
          .Append("../../../Plot/Text/FontAtlases/")
          .Append(TextFontFamily.Name).Append(" ")
          .Append(TextFontStyle.ToString()).Append(" ")
          .Append(FontSize.ToString()).Append(" ")
-         .Append(Settings.GlyphWidth).Append("x").Append(Settings.GlyphHeight)
+         .Append(GlyphWidth).Append("x").Append(GlyphHeight)
          .Append(".bmp")
          .ToString();
 }
@@ -73,7 +76,6 @@ public class TextRenderer : IDisposable
    private Vector2? _coords;
    private Matrix4[] _textMats;
    private Vector2[] _textUVs;
-
    public TextRenderer(string? text = null, TextParams? @params = null)
    {
       _shaderText = new ShaderProgram(new[] { @"Plot/Text/Shaders/text.vert", @"Plot/Text/Shaders/text.frag" },
@@ -137,8 +139,8 @@ public class TextRenderer : IDisposable
    }
    void GenerateFontImage()
    {
-      int bitmapWidth = Settings.GlyphsPerLine * Settings.GlyphWidth;
-      int bitmapHeight = Settings.GlyphLineCount * Settings.GlyphHeight;
+      int bitmapWidth = Settings.GlyphsPerLine * _params.GlyphWidth;
+      int bitmapHeight = Settings.GlyphLineCount * _params.GlyphHeight;
 
       using Bitmap bitmap = new Bitmap(bitmapWidth, bitmapHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
       Font font;
@@ -155,8 +157,8 @@ public class TextRenderer : IDisposable
             {
                char c = (char)(n + p * Settings.GlyphsPerLine);
                g.DrawString(c.ToString(), font, Brushes.White,
-                  n * Settings.GlyphWidth + Settings.AtlasOffsetX,
-                  p * Settings.GlyphHeight + Settings.GlyphHeight - (int)(_params.FontSize * 1.5) + Settings.AtlasOffsetY);// - 4 ); // + Settings.AtlasOffsetY);
+                  n * _params.GlyphWidth + Settings.AtlasOffsetX,
+                  p * _params.GlyphHeight + _params.GlyphHeight - (int)(_params.FontSize) + Settings.AtlasOffsetY);// - 4 ); // + Settings.AtlasOffsetY);
             }
          }
       }
@@ -212,13 +214,23 @@ public class TextRenderer : IDisposable
          PrepareText();
       return this;
    }
-   public void DrawText()
+
+   public TextRenderer SetColor(Color4 color)
+   {
+      _params.Color = color;
+      return this;
+   }
+   public void DrawText(bool isContrastColor)
    {
 
       _shaderText.UseShaders();
       var ortho = camera.GetOrthoMatrix();
       _shaderText.SetMatrix4("projection", ref ortho);
-      _shaderText.SetVec4("textColor", ref _params.Color);
+      Color4 color = isContrastColor ? Color4.White : _params.Color;
+      _shaderText.SetVec4("textColor", ref color);
+
+      if (isContrastColor)
+         GL.BlendFunc(BlendingFactor.OneMinusDstColor, BlendingFactor.OneMinusSrcAlpha);
 
       GL.BindVertexArray(_vaoText);
       GL.ActiveTexture(TextureUnit.Texture0);
@@ -228,6 +240,8 @@ public class TextRenderer : IDisposable
       GL.DrawElementsInstanced(PrimitiveType.TriangleStrip, 4, DrawElementsType.UnsignedInt, IntPtr.Zero, _text.Length);
       GL.BindVertexArray(0);
 
+      if (isContrastColor)
+         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
    }
 
    public void Dispose()
@@ -242,8 +256,8 @@ public class TextRenderer : IDisposable
 
    void PrepareText()
    {
-      float u_step = Settings.GlyphWidth/ (float)_textureWidth;
-      float v_step = Settings.GlyphHeight/ (float)_textureHeight;
+      float u_step = _params.GlyphWidth/ (float)_textureWidth;
+      float v_step = _params.GlyphHeight/ (float)_textureHeight;
 
       var c = _coords!.Value;
       _textMats = new Matrix4[_text.Length];
@@ -255,8 +269,8 @@ public class TextRenderer : IDisposable
          float u = (idx % Settings.GlyphsPerLine) * u_step;
          float v = (idx / Settings.GlyphsPerLine) * v_step;
 
-         _textMats[n] = Matrix4.CreateScale(Settings.GlyphHeight)//(_params.FontSize) 
-                        * Matrix4.CreateTranslation(c.X + _params.FontSize * n, c.Y, 0);//_params.CharXSpacing * n, c.Y, 0);
+         _textMats[n] = Matrix4.CreateScale(_params.GlyphHeight)//(_params.FontSize) 
+                        * Matrix4.CreateTranslation(c.X + _params.GlyphWidth * n, c.Y, 0);//_params.CharXSpacing * n, c.Y, 0);
          _textUVs[n] = new Vector2(u, v);
 
       }

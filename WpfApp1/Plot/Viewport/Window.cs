@@ -8,9 +8,9 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using PlotTest.Function;
-using PlotTest.Shader;
-using PlotTest.Viewport;
+using Plot.Function;
+using Plot.Shader;
+using Plot.Viewport;
 
 namespace Plot;
 

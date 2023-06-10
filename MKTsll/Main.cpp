@@ -110,20 +110,49 @@ void makeReverseTask(const char* cfgFileName, const char* reciversFileName, cons
 }
 
  //make direct
+//int main(int argc, char* argv[])
+//{
+//	std::ifstream in;
+//	in.open(argv[1]);
+//	std::string cfg, recs;
+//	double left, right;
+//	int c;
+//	
+//	in >> cfg >> left >> right >> c >> recs;
+//	std::cout << cfg << " " << left << " " << right << " " << c << " " << recs;
+//
+//	try
+//	{
+//		makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
+//	}
+//	catch (std::exception& e)
+//	{
+//		std::cout << e.what();
+//	}
+//	catch (std::exception* e)
+//	{
+//		std::cout << e->what();
+//	}
+//	
+//	std::cout << "\nsuces";
+//	return 0;
+//}
+
+
 int main(int argc, char* argv[])
 {
+	
 	std::ifstream in;
 	in.open(argv[1]);
-	std::string cfg, recs;
-	double left, right;
-	int c;
-	
-	in >> cfg >> left >> right >> c >> recs;
-	std::cout << cfg << " " << left << " " << right << " " << c << " " << recs;
+	std::cout << argv[1];
+	std::string cfg, recs, ans;
+	double alpha;
+
+	in >> cfg >> recs >> ans >> alpha;
 
 	try
 	{
-		makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
+		makeReverseTask(cfg.c_str(), recs.c_str(), ans.c_str(), alpha );
 	}
 	catch (std::exception& e)
 	{
@@ -133,23 +162,7 @@ int main(int argc, char* argv[])
 	{
 		std::cout << e->what();
 	}
-	
+
 	std::cout << "\nsuces";
 	return 0;
 }
-
-
-//int main(int argc, char* argv[])
-//{
-//	
-//	std::ifstream in;
-//	in.open(argv[1]);
-//	std::cout << argv[1];
-//	std::string cfg, recs, ans;
-//	double alpha;
-//
-//	in >> cfg >> recs >> ans >> alpha;
-//
-//	makeReverseTask(cfg.c_str(), recs.c_str(), ans.c_str(), alpha );
-//	return 0;
-//}

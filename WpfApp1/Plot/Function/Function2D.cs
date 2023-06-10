@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using MeshVisualizator;
 using OpenTK.Mathematics;
-using PlotTest.Shader;
+using Plot.Shader;
 
-namespace PlotTest.Function;
+namespace Plot.Function;
 
 public class Function2D : IFunction
 {
@@ -49,7 +49,7 @@ public class Function2D : IFunction
 
     public void Prepare()
     {
-       _shader = new ShaderProgram(new[] { @"Function/Shaders/func.vert", @"Function/Shaders/func.frag" },
+       _shader = new ShaderProgram(new[] { @"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag" },
           new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
        _shader.LinkShaders();
 
@@ -78,11 +78,13 @@ public class Function2D : IFunction
        GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
        
    }
-    public void Draw(Color4 color)
+    public void Draw(Color4 color, Box2 DrawArea)
     {
        _shader.UseShaders();
        var ortho = Camera2D.Instance.GetOrthoMatrix();
+       var model = Matrix4.CreateScale(DrawArea.Size.X, DrawArea.Size.Y, 1) * Matrix4.CreateTranslation(DrawArea.Center.X, DrawArea.Center.Y, 0);
        _shader.SetMatrix4("projection", ref ortho);
+       _shader.SetMatrix4("model", ref model);
        _shader.SetVec4("color", ref color);
 
        GL.LineWidth(8);

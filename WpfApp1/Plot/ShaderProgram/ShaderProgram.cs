@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 using System.Diagnostics;
 using System.IO;
 
-namespace PlotTest.Shader;
+namespace Plot.Shader;
 
 public class ShaderProgram : IDisposable
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using OpenTK.Mathematics;
 
-namespace PlotTest.Function;
+namespace Plot.Function;
 
 public sealed class FunctionManager
 {
@@ -31,11 +31,11 @@ public sealed class FunctionManager
        _functions.Remove(function);
        _colors.Remove(function);
     }
-    public void DrawFunctions()
+    public void DrawFunctions(Box2 DrawArea)
     {
        foreach (var function in _functions)
        {
-          function.Draw(_colors[function]);
+          function.Draw(_colors[function], DrawArea);
        }
 
     }

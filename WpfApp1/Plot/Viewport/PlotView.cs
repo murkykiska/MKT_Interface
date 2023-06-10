@@ -4,9 +4,9 @@ using System.Drawing.Printing;
 using System.Runtime.InteropServices;
 using MeshVisualizator;
 using OpenTK.Mathematics;
-using PlotTest.Shader;
+using Plot.Shader;
 
-namespace PlotTest.Viewport;
+namespace Plot.Viewport;
 
 public class PlotView
 {
@@ -36,6 +36,7 @@ public class PlotView
       _vbo = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
+
       GL.BufferData(BufferTarget.ArrayBuffer, 8 * sizeof(float), new[]
       {
          -1f, -1f,
@@ -63,6 +64,7 @@ public class PlotView
       GL.Scissor(x0, y0, x1, y1);
       GL.Enable(EnableCap.ScissorTest);
 
+      GL.LineWidth(2);
       GL.BindVertexArray(_vao);
       GL.DrawArrays(PrimitiveType.LineLoop, 0, 4);
 

@@ -1,9 +1,9 @@
 ﻿using OpenTK.Mathematics;
 
-namespace PlotTest.Function;
+namespace Plot.Function;
 
 public interface IFunction
 {
-   void Draw(Color4 color);
+   void Draw(Color4 color, Box2 DrawArea);
 
 }

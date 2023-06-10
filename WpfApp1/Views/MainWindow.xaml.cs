@@ -14,7 +14,8 @@ using OpenTK.Mathematics;
 using OpenTK.Text;
 using OpenTK.Windowing.Common;
 using OpenTK.Wpf;
-using PlotTest.Viewport;
+using Plot.Function;
+using Plot.Viewport;
 
 namespace WpfApp1;
 
@@ -48,8 +49,8 @@ namespace WpfApp1;
 
          gl.Start(new GLWpfControlSettings()
          {
-            MinorVersion = 5,
             MajorVersion = 4,
+            MinorVersion = 5,
             GraphicsProfile = ContextProfile.Core,
          });
          GL.Enable(EnableCap.LineSmooth);
@@ -83,6 +84,8 @@ namespace WpfApp1;
          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
      }
 
+     #region GL
+
     private PlotView plotl, plotr;
     private TextRenderer tr;
     private void gl_Loaded(object sender, RoutedEventArgs e)
@@ -100,52 +103,55 @@ namespace WpfApp1;
       Camera2D.Instance.Position.Y = (float)gl.ActualHeight / 2f;
       Camera2D.Instance.Position = -Vector3.UnitZ;
 
-      plotl = new PlotView { Margin = (10, (int)gl.ActualWidth / 2 - 10, 10, 10) };
-      plotr = new PlotView { Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 10, 10, 10) };
-      tr = new TextRenderer("Huydsadasdasdasdasd",
-         new TextParams()
+      plotl = new PlotView { Margin = (10, (int)gl.ActualWidth / 2 - 20, 10, 10) };
+      plotr = new PlotView { Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 20, 10, 10) };
+      tr = new TextRenderer("Huy",  new TextParams()
          {
             Color = Color4.Chartreuse, FontSize = 14, TextFontFamily = System.Drawing.FontFamily.GenericMonospace,
             TextFontStyle = System.Drawing.FontStyle.Bold
          });
-      tr.SetCoordinates((50, 50));
-
-    }
-   double secTicks = 0;
-   string fps = "";
-   private void gl_OnRender(TimeSpan delta)
-   {
-      GL.ClearColor(Color4.AntiqueWhite);
-      GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-      if (gl.ActualWidth > 0 && gl.ActualHeight > 0)
-      {
-         plotl?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
-            {
-               tr?.DrawText();
-            });
-         plotr?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
-         {
-            GL.ClearColor(Color4.Crimson);
-         });
-      }
-      tr?.DrawText();
-      GL.Finish();
-   }
-   private void gl_SizeChanged(object sender, SizeChangedEventArgs e)
-   {
-
-      var s = ((int)e.NewSize.Width, (int)e.NewSize.Height);
-      GL.Viewport(0,0, s.Item1, s.Item2);
-      Camera2D.Instance.Size = s;
+      tr.SetCoordinates((0, 20));
+      var s = ((int)gl.ActualWidth, (int)gl.ActualHeight);
       plotl?.SetAxes(s);
       plotr?.SetAxes(s);
+    }
+    
+    private void gl_OnRender(TimeSpan delta)
+    {
+       GL.ClearColor(Color4.Gray);
+       GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+    
+       if (gl.ActualWidth > 0 && gl.ActualHeight > 0)
+       {
+          plotl?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
+          {
+               
+          });
+          plotr?.DrawPlotView(((int)gl.ActualWidth, (int)gl.ActualHeight), () =>
+          {
 
-      if (plotl is not null) plotl.Margin = (10, (int)gl.ActualWidth / 2 - 10, 10, 10);
-      if (plotr is not null) plotr.Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 10, 10, 10);
-   }
-   private void gl_Unloaded(object sender, RoutedEventArgs e)
-   {
-      
-   }
+          });
+       }
+       tr?.DrawText(true);
+       GL.Finish();
+    }
+    private void gl_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+    
+       var s = ((int)e.NewSize.Width, (int)e.NewSize.Height);
+       GL.Viewport(0,0, s.Item1, s.Item2);
+       Camera2D.Instance.Size = s;
+       plotl?.SetAxes(s);
+       plotr?.SetAxes(s);
+    
+       if (plotl is not null) plotl.Margin = (10, (int)gl.ActualWidth / 2 - 10, 10, 10);
+       if (plotr is not null) plotr.Margin = (10 + (int)gl.ActualWidth / 2, (int)gl.ActualWidth / 2 - 10, 10, 10);
+    }
+    private void gl_Unloaded(object sender, RoutedEventArgs e)
+    {
+
+    }
+     
+
+     #endregion
 }

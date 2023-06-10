@@ -2,9 +2,9 @@
 using System.Threading.Tasks.Dataflow;
 using MeshVisualizator;
 using OpenTK.Mathematics;
-using PlotTest.Shader;
+using Plot.Shader;
 
-namespace PlotTest.Viewport;
+namespace Plot.Viewport;
 
 public class Axis
 {
