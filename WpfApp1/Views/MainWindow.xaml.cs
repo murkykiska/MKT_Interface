@@ -177,7 +177,12 @@ namespace WpfApp1;
       plotl?.SetAxes(s);
       plotr?.SetAxes(s);
     }
-    
+
+    private void LoadDirectTaskValues_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
     private void gl_OnRender(TimeSpan delta)
     {
        GL.ClearColor(Color4.Gray);
