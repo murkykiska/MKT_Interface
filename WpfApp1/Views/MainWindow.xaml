@@ -214,7 +214,17 @@
                 <r:RibbonGroupBox>
                     <r:Button Header="Create CFG" x:Name="createReverseCFG" Width="50" Click="createReverseCFG_Click"/>
                 </r:RibbonGroupBox>
+                <r:RibbonGroupBox Header="Регуляризация">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
+                        <TextBlock Text="Alpha" Grid.Column="0" Margin="10" />
+                        <r:TextBox x:Name="Alpha" Grid.Column="1" Margin="10" Width="70"/>
+                    </Grid>
+                </r:RibbonGroupBox>
             </r:RibbonTabItem>
             <r:RibbonTabItem Header="Приемники">
                 <r:RibbonGroupBox Header="Параметры приемной линии">
@@ -238,18 +248,6 @@
                         <r:TextBox x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
                         <TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
                         <r:TextBox x:Name="receiverCount" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
-                    </Grid>
-                </r:RibbonGroupBox>
-
-                <r:RibbonGroupBox Header="Регуляризация">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="Alpha" Grid.Column="0" Margin="10" />
-                        <r:TextBox x:Name="Alpha" Grid.Column="1" Margin="10" Width="70"/>
                     </Grid>
                 </r:RibbonGroupBox>
                 <r:RibbonGroupBox>
