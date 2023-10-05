@@ -69,19 +69,17 @@ public class FunctionCell3D : IFunction
       _shaderLine.LinkShaders();
 
       _shader.UseShaders();
-      if (_vao == 0)
-         _vao = GL.GenVertexArray();
+      _vao = GL.GenVertexArray();
       GL.BindVertexArray(_vao);
 
-      if (_vbo == 0)
-         _vbo = GL.GenBuffer();
+      _vbo = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
       {
          GL.BufferData(BufferTarget.ArrayBuffer, 8 * sizeof(float),
             new[]
             {
-               //x  y  us      
+               //x  y     
                -1, -1,
                1, -1,
                -1, 1,
@@ -116,8 +114,8 @@ public class FunctionCell3D : IFunction
 
          GL.BindVertexArray(_vao);
          GL.EnableVertexAttribArray(1);
-         GL.VertexAttribDivisor(1, 1);
          GL.VertexAttribPointer(1, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
+         GL.VertexAttribDivisor(1, 1);
 
 
          GL.BindBuffer(BufferTarget.ArrayBuffer, _vboMat);

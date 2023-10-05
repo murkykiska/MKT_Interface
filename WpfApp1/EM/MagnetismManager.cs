@@ -44,7 +44,7 @@ public class MagnetismManager
    }
    public static void MakeReverse(string directtaskCfg, string recsTxt, string ansTxt, double alpha)
    {
-      string reverse = @"..\..\..\EM\reverse.exe";
+      string reverse = "..\\..\\..\\EM\\reverse.exe";
 
       using (StreamWriter s = new StreamWriter("..\\..\\..\\EM\\reverse_info.txt"))
       {

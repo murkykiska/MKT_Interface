@@ -82,7 +82,7 @@ public class Function2D : IFunction
     {
        _shader.UseShaders();
        var ortho = Camera2D.Instance.GetOrthoMatrix();
-       var model = Matrix4.CreateScale(DrawArea.Size.X, DrawArea.Size.Y, 1) * Matrix4.CreateTranslation(DrawArea.Center.X, DrawArea.Center.Y, 0);
+       var model = Matrix4.CreateScale(1 / DrawArea.Size.X, 1 / DrawArea.Size.Y, 1) * Matrix4.CreateTranslation(DrawArea.Center.X, DrawArea.Center.Y, 0);
        _shader.SetMatrix4("projection", ref ortho);
        _shader.SetMatrix4("model", ref model);
        _shader.SetVec4("color", ref color);

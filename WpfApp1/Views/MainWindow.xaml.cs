@@ -76,7 +76,7 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
    {
       ViewModel.ReverseTask.PrintCFG("../../../ReverseTask.cfg");
 
-      MagnetismManager.MakeReverse("..\\DirectTask.cfg", "..\\Recs.txt", "..\\Cells.txt", double.Parse(Alpha.Text));
+      MagnetismManager.MakeReverse("..\\..\\..\\EM\\DirectTask.cfg", "..\\..\\..\\EM\\Recs.txt", "..\\..\\..\\Cells.txt", double.Parse(Alpha.Text));
       manager.GetRecieverData("..\\..\\..\\Recs.txt");
       num_func = manager.GetRecieversDataOnPlane(true, 0);
       num_func.Prepare();

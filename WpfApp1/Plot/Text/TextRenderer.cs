@@ -4,7 +4,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using MeshVisualizator;
 using OpenTK.Mathematics;
