@@ -1,9 +1,8 @@
-﻿using MeshVisualizator;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using Plot.Shader;
 using System.Linq;
 using System;
-using System.Windows.Xps;
+using Plot.Viewport;
 
 namespace Plot.Function;
 

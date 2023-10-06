@@ -1,4 +1,0 @@
-..\..\..\EM\DirectTask.cfg
-..\..\..\EM\Recs.txt
-..\..\..\Cells.txt
-0

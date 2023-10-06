@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace MeshVisualizator;
+namespace Plot.Viewport;
 
 public class Camera2D
 {

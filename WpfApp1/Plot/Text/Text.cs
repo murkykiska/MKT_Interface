@@ -5,9 +5,9 @@ using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
 using System.Text;
-using MeshVisualizator;
 using OpenTK.Mathematics;
 using Plot.Shader;
+using Plot.Viewport;
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 using ShaderType = OpenTK.Graphics.OpenGL4.ShaderType;
 
@@ -27,7 +27,7 @@ public enum TextAlignment
    Bottom = 0b1000
 }
 
-static class Settings
+static class TextSettings
 {
    //public static int GlyphHeight = 64;
    //public static int GlyphWidth = 64;
@@ -38,7 +38,7 @@ static class Settings
 
 public class TextParams
 {
-   public FontFamily TextFontFamily;
+   public required FontFamily TextFontFamily;
    public FontStyle TextFontStyle;
    public TextAlignment Alignment;
    public Color4 Color = Color4.Black;
@@ -58,7 +58,7 @@ public class TextParams
          .ToString();
 }
 
-public class TextRenderer : IDisposable
+public class Text : IDisposable
 {
    Camera2D camera = Camera2D.Instance;
 
@@ -72,11 +72,15 @@ public class TextRenderer : IDisposable
    private string _text;
    private TextParams _params;
    public TextParams Params => _params;
+
+   public int WidthInPixels => (_text.Length - 1) * _params.CharXSpacing + _text.Length * TextSettings.AtlasOffsetX;
+   public int HeightInPixels => TextSettings.AtlasOffsetY;
+
    private int _textureWidth, _textureHeight;
-   private Vector2? _coords;
+   private Vector2 _coords = default;
    private Matrix4[] _textMats;
    private Vector2[] _textUVs;
-   public TextRenderer(string? text = null, TextParams? @params = null)
+   public Text(string? text = null, TextParams @params = null)
    {
       _shaderText = new ShaderProgram(new[] { @"Plot/Text/Shaders/text.vert", @"Plot/Text/Shaders/text.frag" },
                                          new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
@@ -99,14 +103,14 @@ public class TextRenderer : IDisposable
 
    }
 
-   public TextRenderer SetTextBox(Box2 box, (float top, float down, float left, float right) padding, Color4 backgroundColor)
+   public Text SetTextBox(Box2 box, (float top, float down, float left, float right) padding, Color4 backgroundColor)
    {
       _shaderTextBox = new ShaderProgram(new[] { @"Text/Shaders/textBox.vert", @"Text/Shaders/textBox.frag" },
                                          new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
       _shaderTextBox.LinkShaders();
 
-      var ur = box.Max - _coords.Value;
-      var ld = box.Min - _coords.Value;
+      var ur = box.Max - _coords;
+      var ld = box.Min - _coords;
       _vertices = new[]
       {
          ld.X, ld.Y,
@@ -131,16 +135,19 @@ public class TextRenderer : IDisposable
       
       GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
       GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+      //GL.TexImage2DMultisample(TextureTargetMultisample.Texture2DMultisample, 4, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, true);
       bitmap.UnlockBits(data);
       GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
       GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
       _textureWidth = bitmap.Width; _textureHeight = bitmap.Height;
       GL.BindTexture(TextureTarget.Texture2D, 0);
+
+      //GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2DMultisample, 0, 0);
    }
    void GenerateFontImage()
    {
-      int bitmapWidth = Settings.GlyphsPerLine * _params.GlyphWidth;
-      int bitmapHeight = Settings.GlyphLineCount * _params.GlyphHeight;
+      int bitmapWidth = TextSettings.GlyphsPerLine * _params.GlyphWidth;
+      int bitmapHeight = TextSettings.GlyphLineCount * _params.GlyphHeight;
 
       using Bitmap bitmap = new Bitmap(bitmapWidth, bitmapHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
       Font font;
@@ -151,14 +158,14 @@ public class TextRenderer : IDisposable
          g.SmoothingMode = SmoothingMode.HighQuality;
          g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
-         for (int p = 0; p < Settings.GlyphLineCount; p++)
+         for (int p = 0; p < TextSettings.GlyphLineCount; p++)
          {
-            for (int n = 0; n < Settings.GlyphsPerLine; n++)
+            for (int n = 0; n < TextSettings.GlyphsPerLine; n++)
             {
-               char c = (char)(n + p * Settings.GlyphsPerLine);
+               char c = (char)(n + p * TextSettings.GlyphsPerLine);
                g.DrawString(c.ToString(), font, Brushes.White,
-                  n * _params.GlyphWidth + Settings.AtlasOffsetX,
-                  p * _params.GlyphHeight + _params.GlyphHeight - (int)(_params.FontSize) + Settings.AtlasOffsetY);// - 4 ); // + Settings.AtlasOffsetY);
+                  n * _params.GlyphWidth + TextSettings.AtlasOffsetX,
+                  p * _params.GlyphHeight + _params.GlyphHeight - (int)(_params.FontSize) + TextSettings.AtlasOffsetY);// - 4 ); // + Settings.AtlasOffsetY);
             }
          }
       }
@@ -187,7 +194,7 @@ public class TextRenderer : IDisposable
 
    }
 
-   public TextRenderer SetTextAndParam(string text, TextParams textParams)
+   public Text SetTextAndParam(string text, TextParams textParams)
    {
       _text = text;
       _params = textParams;
@@ -196,25 +203,24 @@ public class TextRenderer : IDisposable
 
       SetupFont();
 
-      if (_coords is not null)
-         PrepareText();
+      PrepareText();
       return this;
    }
-   public TextRenderer SetText(string text)
+   public Text SetText(string text)
    {
       _text = text;
-      if (_coords is not null && _params is not null)
+      if (_params is not null)
         PrepareText();
       return this;
    }
-   public TextRenderer SetCoordinates(Vector2 coords)
+   public Text SetCoordinates(Vector2 coords)
    {
       _coords = coords;
       if (!string.IsNullOrEmpty(_text) && _params is not null)
          PrepareText();
       return this;
    }
-   public TextRenderer SetColor(Color4 color)
+   public Text SetColor(Color4 color)
    {
       _params.Color = color;
       return this;
@@ -233,6 +239,7 @@ public class TextRenderer : IDisposable
 
       GL.BindVertexArray(_vaoText);
       GL.ActiveTexture(TextureUnit.Texture0);
+      //GL.BindTexture(TextureTarget.Texture2DMultisample, _textureID);
       GL.BindTexture(TextureTarget.Texture2D, _textureID);
       GL.DrawElementsInstanced(PrimitiveType.TriangleStrip, 4, DrawElementsType.UnsignedInt, IntPtr.Zero, _text.Length);
       GL.BindVertexArray(0);
@@ -256,15 +263,15 @@ public class TextRenderer : IDisposable
       float u_step = _params.GlyphWidth/ (float)_textureWidth;
       float v_step = _params.GlyphHeight/ (float)_textureHeight;
 
-      var c = _coords!.Value;
+      var c = _coords;
       _textMats = new Matrix4[_text.Length];
       _textUVs = new Vector2[_text.Length];
 
       for (int n = 0; n < _text.Length; n++)
       {
          char idx = _text[n];
-         float u = (idx % Settings.GlyphsPerLine) * u_step;
-         float v = (idx / Settings.GlyphsPerLine) * v_step;
+         float u = (idx % TextSettings.GlyphsPerLine) * u_step;
+         float v = (idx / TextSettings.GlyphsPerLine) * v_step;
 
          _textMats[n] = Matrix4.CreateScale(_params.GlyphHeight)//(_params.FontSize) 
                         * Matrix4.CreateTranslation(c.X + (_params.GlyphWidth - _params.CharXSpacing) * n, c.Y, 0);//_params.CharXSpacing * n, c.Y, 0);

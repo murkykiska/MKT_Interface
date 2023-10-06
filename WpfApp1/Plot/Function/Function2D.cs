@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MeshVisualizator;
 using OpenTK.Mathematics;
 using Plot.Shader;
+using Plot.Viewport;
 
 namespace Plot.Function;
 
