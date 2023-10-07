@@ -67,7 +67,7 @@ public class Axis
         _axis_position = axis_position;
         _ticksNum = ticksNum;
         _pos = position;
-        _texts = new Text[ticksNum / 4 + 1];
+        _texts = new Text[ticksNum / 5 + 1];
 
         if (!_isShaderInitialized)
         {

@@ -8,7 +8,9 @@ using OpenTK.Wpf;
 using Plot.Function;
 using Plot.Viewport;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -80,28 +82,6 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
         //cell_func = manager.GetMagnetismData(true);
         //cell_func.Prepare();
 
-        (double min, double max) = (num_func.GetDomain().Min.X, num_func.GetDomain().Max.X);
-
-        (min, max) = (num_func.GetDomain().Min.Y, num_func.GetDomain().Max.Y);
-
-
-        //(min, max) = (cell_func.GetDomain().Min.X, cell_func.GetDomain().Max.X);
-        //for (int i = 0; i < p2XVals.Length - 1; i++)
-        //{
-        //   var ix = min + i * (max - min) / 8;
-        //   p2XVals[i].SetText(ix.ToString("g3"));
-        //}
-        //p2XVals[^1].SetText(max.ToString("g3"));
-        //
-        //(min, max) = (cell_func.GetDomain().Min.Y, cell_func.GetDomain().Max.Y);
-        //for (int i = 0; i < p2YVals.Length - 1; i++)
-        //{
-        //   var iy = min + i * (max - min) / 8;
-        //   p2YVals[i].SetText(iy.ToString("g4"));
-        //}
-        //p2YVals[^1].SetText(max.ToString("g4"));
-
-        //viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
 
     }
     private void EnterRecievers_Click(object sender, RoutedEventArgs e)
@@ -119,15 +99,8 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
 
         cell_func.Prepare();
 
-        (double min, double max) = (cell_func.GetDomain().Min.X, cell_func.GetDomain().Max.X);
+        viewModel.ReDrawPalette(cell_func.Min, cell_func.Max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
 
-
-        (min, max) = (cell_func.GetDomain().Min.Y, cell_func.GetDomain().Max.Y);
-        // 
-
-
-
-        viewModel.ReDrawPalette(cell_func.min, cell_func.max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
 
 
     }
@@ -141,7 +114,7 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
 
     //private MagnetismManager manager;
     private Function2D num_func;
-    private FunctionCell3D cell_func;
+    private FunctionCell2D cell_func;
     private PlotManager plotManager = PlotManager.Instance;
     private void gl_Loaded(object sender, RoutedEventArgs e)
     {
@@ -158,6 +131,12 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
         Camera2D.Instance.Position.Y = (float)gl.ActualHeight / 2f;
         Camera2D.Instance.Position = -Vector3.UnitZ;
 
+        num_func = new Function2D();
+        List<Vector2> points = new();
+        for (float i = -300; i <= 300; i+=1)
+            points.Add(new Vector2(i / 20f, MathF.Sin(i/20) * 200) );
+        num_func.FillPoints(points.ToArray());
+        num_func.Prepare();
 
         var text = new Text()
             .SetCoordinates(new Vector2(-240, 0))
@@ -170,18 +149,27 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
                 CharXSpacing = 3
             });
 
-        PlotView plotl = new PlotView("X", "Bz") { Margin = (25, 35, 30, 30), DrawFunc = 
-            () =>
+        PlotView plotl = new PlotView("X", "Bz") { Margin = (25, 35, 30, 30),
+            DrawFunction =
+            (Box2 DrawArea) =>
             {
-                num_func?.Draw(Color4.HotPink, num_func.GetDomain());
-                text.DrawText(false);
+                GL.LineWidth(3);
+                Box2 funcDomain = num_func?.GetDomain() ?? new((1f,1f),(1f,1f));
+                Vector2 Skew = DrawArea.Size / funcDomain.Size;
+                
+                num_func?.Draw(Color4.HotPink, funcDomain.Center, Skew);
+                return num_func?.GetDomain() ?? default;
             }
         };
         var plotr = new PlotView("X", "Z") { Margin = (25, 35, 30, 30), DrawFunc = 
             () =>
             {
-                cell_func?.Draw(Color4.Black, cell_func.GetDomain());
                 text.DrawText(false);
+            },
+            DrawFunction = (Box2 DrawArea) =>
+            {
+                cell_func?.Draw(Color4.Black, cell_func.GetDomain().Center, Vector2.One);
+                return cell_func?.GetDomain() ?? default;
             }
         };
         Axis.TickMaxSize = 15;

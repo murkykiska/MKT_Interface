@@ -39,7 +39,6 @@ public class ShaderProgram : IDisposable
       {
          string info;
          GL.GetShaderInfoLog(shader, out info);
-         //TODO: logger
          throw new Exception(info);
       }
 

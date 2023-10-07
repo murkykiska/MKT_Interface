@@ -7,18 +7,20 @@ namespace Plot.Viewport;
 
 public class PlotView
 {
-    private int _vao, _vbo;
+    private readonly int _vao, _vbo;
     private static ShaderProgram _shader;
     private static bool _shaderInitialized = false;
 
-    public Action DrawFunc { set; private get; }
     private Axis _yAxis, _xAxis;
     private Text[] _axisNames;
+    public Action DrawFunc { set; private get; }
+    public Func<Box2, Box2> DrawFunction { set; private get; }
 
-    //new Text("Z", axistparams).SetCoordinates((p2x0 - Axis.TickMaxSize, p2y1 + 5f)),
-    //            new Text("X", axistparams).SetCoordinates((p2x1 + 5f, p2y0 - (float) axistparams.FontSize / 2))
+    public (float X0, float X1) XRange;
+    public (float Y0, float Y1) YRange;
 
-private (int x0, int x1, int y0, int y1) _margin = (10, 10, 10, 10);
+
+    private (int x0, int x1, int y0, int y1) _margin = (10, 10, 10, 10);
     public (int x0, int x1, int y0, int y1) Margin
     {
         set => _margin = value;
@@ -54,7 +56,7 @@ private (int x0, int x1, int y0, int y1) _margin = (10, 10, 10, 10);
 
         GL.LineWidth(1);
 
-        TextParams axistparams = new TextParams()
+        TextParams axistparams = new()
         {
             Color = Color4.Black,
             FontSize = 14,
@@ -79,25 +81,33 @@ private (int x0, int x1, int y0, int y1) _margin = (10, 10, 10, 10);
     }
     public void DrawPlotView(Vector2i ViewportSize)
     {
-        //if (_plotBox.x0 >= _plotBox.x1 || _plotBox.y0 >= _plotBox.y1)
-        //    return;    
+        if (_plotBox.x1 - _plotBox.x0 <= 0 || _plotBox.y1 - _plotBox.y0 <= 0)
+            return;
         //x0 =  _margin.x0 + Axis.Margin + Axis.TickMaxSize;
         //x1 =  _margin.x1 - Axis.Margin - Axis.TickMaxSize;
         //y0 =  _margin.y0 + Axis.Margin + Axis.TickMaxSize;
         //y1 =  ViewportSize.Y - (_margin.y1 * 2 + Axis.Margin) - Axis.TickMaxSize;
 
-        _shader.UseShaders();
         GL.Viewport(_plotBox.x0, _plotBox.y0, _plotBox.x1 - _plotBox.x0, _plotBox.y1 - _plotBox.y0);
         GL.Scissor(_plotBox.x0, _plotBox.y0, _plotBox.x1 - _plotBox.x0, _plotBox.y1 - _plotBox.y0);
         GL.Enable(EnableCap.ScissorTest);
 
+        Camera2D.Instance.Size = (_plotBox.x1 - _plotBox.x0, _plotBox.y1 - _plotBox.y0);
+        
+        { 
+            Box2 area = new Box2((_plotBox.x0, _plotBox.y0), (_plotBox.x1, _plotBox.y1));
+
+            Box2 domain = DrawFunction?.Invoke(area) ?? default;
+            XRange = (domain.Min.X, domain.Max.X);
+            YRange = (domain.Min.Y, domain.Max.Y);
+
+            DrawFunc?.Invoke();
+        }
+
+        _shader.UseShaders();
         GL.LineWidth(2);
         GL.BindVertexArray(_vao);
         GL.DrawArrays(PrimitiveType.LineLoop, 0, 4);
-
-        Camera2D.Instance.Size = (_plotBox.x1 - _plotBox.x0, _plotBox.y1 - _plotBox.y0);
-
-        DrawFunc.Invoke();
 
         // Stop clipping
         GL.Viewport(0, 0, ViewportSize.X, ViewportSize.Y);
@@ -112,7 +122,7 @@ private (int x0, int x1, int y0, int y1) _margin = (10, 10, 10, 10);
         _axisNames[1].DrawText(false);
     }
 
-    public void SetAxes((float X0, float X1) XRange, (float Y0, float Y1) YRange)
+    public void SetAxes()
     {
         int x0 = _plotBox.x0 - Camera2D.Instance.Size.X / 2,
             x1 = _plotBox.x1 - Camera2D.Instance.Size.X / 2,

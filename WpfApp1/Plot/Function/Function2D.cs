@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using Plot.Shader;
 using Plot.Viewport;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Plot.Function;
 
@@ -11,13 +11,14 @@ public class Function2D : IFunction
 {
     private int _vao = 0, _vbo = 0;
     private Vector2[] _points;
-    private ShaderProgram _shader;
+    private static ShaderProgram _shader;
+    private static bool _shaderInitialized = false;
     public IEnumerable<Vector2> Points => _points.OrderBy(p => p.X);
 
-    //public Function2D()
-    //{
-    //   Prepare();
-    //}
+    public Function2D()
+    {
+        
+    }
     public Box2 GetDomain()
     {
         if (_points == null)
@@ -49,46 +50,52 @@ public class Function2D : IFunction
 
     public void Prepare()
     {
-       _shader = new ShaderProgram(new[] { @"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag" },
-          new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
-       _shader.LinkShaders();
+        if (!_shaderInitialized)
+        {
+            _shaderInitialized = true;
+            _shader = new ShaderProgram(new[] { @"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag" },
+              new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
+            _shader.LinkShaders();
 
-       float[] pointsFloats = new float[2 * _points.Length];
-       for (int i = 0; i < _points.Length * 2; i+=2)
-       {
-          pointsFloats[i] = _points[i / 2].X;
-          pointsFloats[i + 1] = _points[i / 2].Y;
-       }
+        }
 
-       if (_vao == 0)
-         _vao = GL.GenVertexArray();
-       GL.BindVertexArray(_vao);
+        float[] pointsFloats = new float[2 * _points.Length];
+        for (int i = 0; i < _points.Length * 2; i += 2)
+        {
+            pointsFloats[i] = _points[i / 2].X;
+            pointsFloats[i + 1] = _points[i / 2].Y;
+        }
 
-       if (_vbo == 0)
-          _vbo = GL.GenBuffer();
-       GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+        if (_vao == 0)
+            _vao = GL.GenVertexArray();
+        GL.BindVertexArray(_vao);
 
-       GL.BufferData(BufferTarget.ArrayBuffer, pointsFloats.Length * sizeof(float), pointsFloats, BufferUsageHint.StreamDraw);
+        if (_vbo == 0)
+            _vbo = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
-       GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
-       GL.EnableVertexAttribArray(0);
+        GL.BufferData(BufferTarget.ArrayBuffer, pointsFloats.Length * sizeof(float), pointsFloats, BufferUsageHint.StreamDraw);
 
-       GL.BindVertexArray(0);
+        GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+        GL.EnableVertexAttribArray(0);
 
-       GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
-       
-   }
-    public void Draw(Color4 color, Box2 DrawArea)
+        GL.BindVertexArray(0);
+
+        GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
+
+    }
+    public void Draw(Color4 color, Vector2 center, Vector2 scale)
     {
-       _shader.UseShaders();
-       var ortho = Camera2D.Instance.GetOrthoMatrix();
-       var model = Matrix4.CreateScale(1 / DrawArea.Size.X, 1 / DrawArea.Size.Y, 1) * Matrix4.CreateTranslation(DrawArea.Center.X, DrawArea.Center.Y, 0);
-       _shader.SetMatrix4("projection", ref ortho);
-       _shader.SetMatrix4("model", ref model);
-       _shader.SetVec4("color", ref color);
+        _shader.UseShaders();
+        var ortho = Camera2D.Instance.GetOrthoMatrix();
+        var model = Matrix4.CreateScale(scale.X, scale.Y, 1) *
+                    Matrix4.CreateTranslation(center.X, center.Y, 0);
 
-       GL.LineWidth(8);
-       GL.BindVertexArray(_vao);
-       GL.DrawArrays(PrimitiveType.LineStrip, 0, _points.Length);
-   }
+        _shader.SetMatrix4("projection", ref ortho);
+        _shader.SetMatrix4("model", ref model);
+        _shader.SetVec4("color", ref color);
+
+        GL.BindVertexArray(_vao);
+        GL.DrawArrays(PrimitiveType.LineStrip, 0, _points.Length);
+    }
 }

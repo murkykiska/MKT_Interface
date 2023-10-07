@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using Plot.Viewport;
-using System.Linq;
 
 namespace MKT_Interface.Plot;
 
@@ -22,7 +21,7 @@ internal class PlotManager
 
 
         foreach (var plot in _plots)
-            plot.SetAxes(default, default);
+            plot.SetAxes();
 
         ResetPlots(ViewportSize);
     }
@@ -48,11 +47,11 @@ internal class PlotManager
                     area.Min = ( viewportSize.X / _nColumns * j, area.Min.Y);
                     area.Max = ( viewportSize.X, area.Max.Y);
                     plot.SetPlot(area);
-                    plot.SetAxes(default, default);
+                    plot.SetAxes();
                     break;
                 }
                 plot.SetPlot(area);
-                plot.SetAxes(default, default);
+                plot.SetAxes();
                 
             }
         }
