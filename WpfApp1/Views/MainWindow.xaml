@@ -284,7 +284,7 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Value1}" Margin="10 10 0 0"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Value7}" Margin="10 10 0 0"/>
             <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Value6}" Margin="10 10 0 0"/>
             <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Value5}" Margin="10 10 0 0"/>
             <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Value4}" Margin="10 10 0 0"/>

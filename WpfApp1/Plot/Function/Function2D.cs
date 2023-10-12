@@ -17,17 +17,20 @@ public class Function2D : IFunction
 
     public Function2D()
     {
-        
+
     }
-    public Box2 GetDomain()
+    public Box2 Domain
     {
-        if (_points == null)
-            throw new Exception("Function2D was not defined!");
+        get
+        {
+            if (_points == null)
+                throw new Exception("Function2D was not defined!");
 
-        _points = _points.OrderBy(p => p.X).ToArray();
-        var pointsByY = _points.OrderBy(p => p.Y).ToArray();
+            _points = _points.OrderBy(p => p.X).ToArray();
+            var pointsByY = _points.OrderBy(p => p.Y).ToArray();
 
-        return new Box2 { Min = (_points[0].X, pointsByY[0].Y), Max = (_points[^1].X, pointsByY[^1].Y) };
+            return new Box2 { Min = (_points[0].X, pointsByY[0].Y), Max = (_points[^1].X, pointsByY[^1].Y) };
+        }
     }
 
     public void FillPoints(float[] x, float[] y)
@@ -84,18 +87,20 @@ public class Function2D : IFunction
         GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
 
     }
-    public void Draw(Color4 color, Vector2 center, Vector2 scale)
+    public void Draw(Color4 color, Box2 drawArea)
     {
+        Vector2 Skew = drawArea.Size / Domain.Size;
+
         _shader.UseShaders();
         var ortho = Camera2D.Instance.GetOrthoMatrix();
-        var model = Matrix4.CreateScale(scale.X, scale.Y, 1) *
-                    Matrix4.CreateTranslation(center.X, center.Y, 0);
+        var model = Matrix4.CreateScale(Skew.X, Skew.Y, 1) *
+                    Matrix4.CreateTranslation(-Domain.Center.X * Skew.X, -Domain.Center.Y * Skew.Y, 0);
 
         _shader.SetMatrix4("projection", ref ortho);
         _shader.SetMatrix4("model", ref model);
         _shader.SetVec4("color", ref color);
 
         GL.BindVertexArray(_vao);
-        GL.DrawArrays(PrimitiveType.LineStrip, 0, _points.Length);
+        GL.DrawArrays(PrimitiveType.Lines, 0, _points.Length);
     }
 }

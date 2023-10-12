@@ -94,10 +94,7 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
         //manager.GetTrueCells("..\\DirectTask.cfg", "..\\CellsTrue.txt");
         //manager.ReadCells("..\\..\\..\\CellsTrue.txt");
         //cell_func = manager.GetMagnetismData(true);
-        cell_func.Color0 = (viewModel.Palette.Color1.R / 255f, viewModel.Palette.Color1.G / 255f, viewModel.Palette.Color1.B / 255f);
-        cell_func.Color1 = (viewModel.Palette.Color2.R / 255f, viewModel.Palette.Color2.G / 255f, viewModel.Palette.Color2.B / 255f);
 
-        cell_func.Prepare();
 
         viewModel.ReDrawPalette(cell_func.Min, cell_func.Max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
 
@@ -133,43 +130,42 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
 
         num_func = new Function2D();
         List<Vector2> points = new();
-        for (float i = -300; i <= 300; i+=1)
-            points.Add(new Vector2(i / 20f, MathF.Sin(i/20) * 200) );
+        for (float i = -0; i <= 300; i+=1)
+            points.Add(new Vector2(i / 20f, MathF.Sin(i / 20f) * 20) );
         num_func.FillPoints(points.ToArray());
         num_func.Prepare();
 
-        var text = new Text()
-            .SetCoordinates(new Vector2(-240, 0))
-            .SetTextAndParam("abcdefghijklmnopqrstuvxyz0123456789", new TextParams()
-            {
-                Color = Color4.DeepPink,
-                TextFontStyle = System.Drawing.FontStyle.Bold,
-                FontSize = 14,
-                TextFontFamily = System.Drawing.FontFamily.GenericSansSerif,
-                CharXSpacing = 3
-            });
+
+        cell_func = new FunctionCell2D();
+        //x0 y0 x1 y1
+        cell_func.SetCells(new[] { new Box2(0, 0, 2, 3),
+                                   new Box2(2, 3, 3, 4),
+                                   new Box2(2, 0, 3, 3),
+                                   new Box2(0, 3, 2, 4) },
+                                   new[] { 1f, 2f, 3f,  4f });
+        //cell_func.SetCells(new[] { new Box2(0, 0, 1, 2) }, new[] { 1f });
+
+        cell_func.Color0 = (viewModel.Palette.Color1.R / 255f, viewModel.Palette.Color1.G / 255f, viewModel.Palette.Color1.B / 255f);
+        cell_func.Color1 = (viewModel.Palette.Color2.R / 255f, viewModel.Palette.Color2.G / 255f, viewModel.Palette.Color2.B / 255f);
+
+        cell_func.Prepare();
 
         PlotView plotl = new PlotView("X", "Bz") { Margin = (25, 35, 30, 30),
             DrawFunction =
             (Box2 DrawArea) =>
             {
-                GL.LineWidth(3);
-                Box2 funcDomain = num_func?.GetDomain() ?? new((1f,1f),(1f,1f));
-                Vector2 Skew = DrawArea.Size / funcDomain.Size;
-                
-                num_func?.Draw(Color4.HotPink, funcDomain.Center, Skew);
-                return num_func?.GetDomain() ?? default;
+                GL.LineWidth(3);             
+                num_func?.Draw(Color4.HotPink, DrawArea);
+                return num_func?.Domain ?? default;
             }
         };
-        var plotr = new PlotView("X", "Z") { Margin = (25, 35, 30, 30), DrawFunc = 
-            () =>
+        var plotr = new PlotView("X", "Z") { Margin = (25, 35, 30, 30),
+            DrawFunction = 
+            (Box2 DrawArea) =>
             {
-                text.DrawText(false);
-            },
-            DrawFunction = (Box2 DrawArea) =>
-            {
-                cell_func?.Draw(Color4.Black, cell_func.GetDomain().Center, Vector2.One);
-                return cell_func?.GetDomain() ?? default;
+                GL.LineWidth(4);
+                cell_func?.Draw(Color4.Orange, DrawArea);
+                return cell_func?.Domain ?? default;
             }
         };
         Axis.TickMaxSize = 15;

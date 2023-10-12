@@ -1,7 +1,7 @@
 ﻿#version 450 core
 
 layout (location = 0) in vec2 aPosition;
-layout (location = 1) in mat4 position;
+layout (location = 3) in mat4 position;
 
 out vec4 color;
 

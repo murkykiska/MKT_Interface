@@ -4,7 +4,7 @@ namespace Plot.Function;
 
 public interface IFunction
 {
-   void Draw(Color4 color, Vector2 center, Vector2 scale);
-   Box2 GetDomain();
+   void Draw(Color4 color, Box2 drawArea);
+   Box2 Domain { get; }
 
 }
