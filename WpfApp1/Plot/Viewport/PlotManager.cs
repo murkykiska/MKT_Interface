@@ -9,7 +9,7 @@ internal class PlotManager
     private PlotManager() { }
 
     private static PlotManager instance = null;
-    public static PlotManager Instance => instance ?? new PlotManager();
+    public static PlotManager Instance => instance = instance ?? new PlotManager();
     public Vector2i ViewportSize { get; set; }
 
     int _nRows, _nColumns;

@@ -25,20 +25,18 @@ public class ShaderProgram : IDisposable
    private int MakeShader(string shader_filepath, ShaderType type)
    {
       int shader = GL.CreateShader(type);
-      using (StreamReader sr = new(@"../../../" + shader_filepath))
+      using (StreamReader sr = new(shader_filepath))
       {
          string shader_text = sr.ReadToEnd();
          GL.ShaderSource(shader, shader_text);
       }
 
       GL.CompileShader(shader);
-      int status;
-      GL.GetShader(shader, ShaderParameter.CompileStatus, out status);
+      GL.GetShader(shader, ShaderParameter.CompileStatus, out int status);
 
       if (status == 0)
       {
-         string info;
-         GL.GetShaderInfoLog(shader, out info);
+         GL.GetShaderInfoLog(shader, out string info);
          throw new Exception(info);
       }
 

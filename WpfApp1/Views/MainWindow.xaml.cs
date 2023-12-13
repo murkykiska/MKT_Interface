@@ -142,7 +142,7 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
                                    new Box2(2, 3, 3, 4),
                                    new Box2(2, 0, 3, 3),
                                    new Box2(0, 3, 2, 4) },
-                                   new[] { 1f, 2f, 3f,  4f });
+                                   new[] { 1f, 2f, 3f, 4f });
         //cell_func.SetCells(new[] { new Box2(0, 0, 1, 2) }, new[] { 1f });
 
         cell_func.Color0 = (viewModel.Palette.Color1.R / 255f, viewModel.Palette.Color1.G / 255f, viewModel.Palette.Color1.B / 255f);
