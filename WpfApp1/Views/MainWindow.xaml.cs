@@ -95,11 +95,7 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
         //manager.ReadCells("..\\..\\..\\CellsTrue.txt");
         //cell_func = manager.GetMagnetismData(true);
 
-
         viewModel.ReDrawPalette(cell_func.Min, cell_func.Max, Color.FromRgb(63, 63, 63), Color.FromRgb(195, 195, 195));
-
-
-
     }
     public event PropertyChangedEventHandler? PropertyChanged = null!;
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

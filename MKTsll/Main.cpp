@@ -174,47 +174,20 @@ void makeReverseTask(const char* cfgFileName, const char* reciversFileName, cons
 }
 
 //make direct
-//int main(int argc, char* argv[])
-//{
-//	std::ifstream in;
-//	in.open(argv[1]);
-//	std::string cfg, recs, cells;
-//	double left, right;
-//	int c;
-//	
-//	in >> cfg >> left >> right >> c >> recs >> cells;
-//	std::cout << cfg << " " << left << " " << right << " " << c << " " << recs;
-//
-//	try
-//	{
-//		makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
-//	}
-//	catch (std::exception& e)
-//	{
-//		std::cout << e.what();
-//	}
-//	catch (std::exception* e)
-//	{
-//		std::cout << e->what();
-//	}
-//	
-//	std::cout << "\nsuces";
-//	return 0;
-//}
-
 int main(int argc, char* argv[])
 {
 	std::ifstream in;
-	std::cout << argv[1] << '\n';
 	in.open(argv[1]);
-	std::string cfg, ans;
-
-	in >> cfg >> ans;
-	std::cout << cfg << "----" << ans << " \nsuces";
+	std::string cfg, recs, cells;
+	double left, right;
+	int c;
+	
+	in >> cfg >> left >> right >> c >> recs >> cells;
+	std::cout << cfg << " " << left << " " << right << " " << c << " " << recs;
 
 	try
 	{
-		writeDirectTaskMeshInBinaryFile(cfg.c_str(), ans.c_str());
+		makeDirectTask(cfg.c_str(), left, right, c, recs.c_str());
 	}
 	catch (std::exception& e)
 	{
@@ -225,11 +198,38 @@ int main(int argc, char* argv[])
 		std::cout << e->what();
 	}
 	
-	std::cout << cfg << " " << ans << " \nsuces";
-	char c;
-	std::cin >>  c;
+	std::cout << "\nsuces";
 	return 0;
 }
+
+//int main(int argc, char* argv[])
+//{
+//	std::ifstream in;
+//	std::cout << argv[1] << '\n';
+//	in.open(argv[1]);
+//	std::string cfg, ans;
+//
+//	in >> cfg >> ans;
+//	std::cout << cfg << "----" << ans << " \nsuces";
+//
+//	try
+//	{
+//		writeDirectTaskMeshInBinaryFile(cfg.c_str(), ans.c_str());
+//	}
+//	catch (std::exception& e)
+//	{
+//		std::cout << e.what();
+//	}
+//	catch (std::exception* e)
+//	{
+//		std::cout << e->what();
+//	}
+//	
+//	std::cout << cfg << " " << ans << " \nsuces";
+//	char c;
+//	std::cin >>  c;
+//	return 0;
+//}
 
 //int main(int argc, char* argv[])
 //{
