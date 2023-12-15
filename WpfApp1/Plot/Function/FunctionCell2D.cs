@@ -8,15 +8,15 @@ namespace Plot.Function;
 
 public class FunctionCell2D : IFunction
 {
-    private Box2[] _cells;
-    private float[] _values;
-    private Matrix4[] _mats;
-    private Vector3[] _colors;
+    private Box2[] _cells = null!;
+    private float[] _values = null!;
+    private Matrix4[] _mats = null!;
+    private Vector3[] _colors = null!;
 
     public float Min => _values.Min();
     public float Max => _values.Max();
 
-    private static ShaderProgram _shader, _shaderLine;
+    private static ShaderProgram _shader = null!, _shaderLine = null!;
     private static bool _shadersInitialized = false;
 
     private int _vaoCell, _vaoBorder;

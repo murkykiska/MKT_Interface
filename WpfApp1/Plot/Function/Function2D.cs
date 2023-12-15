@@ -10,8 +10,8 @@ namespace Plot.Function;
 public class Function2D : IFunction
 {
     private int _vao = 0, _vbo = 0;
-    private Vector2[] _points;
-    private static ShaderProgram _shader;
+    private Vector2[] _points = null!;
+    private static ShaderProgram _shader = null!;
     private static bool _shaderInitialized = false;
     public IEnumerable<Vector2> Points => _points.OrderBy(p => p.X);
 

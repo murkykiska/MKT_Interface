@@ -23,7 +23,7 @@ namespace WpfApp1;
 /// </summary>
 public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
 {
-    private ViewModel viewModel;
+    private ViewModel viewModel = null!;
     public ViewModel ViewModel
     {
         get { return viewModel; }
@@ -101,8 +101,8 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
 
 
     }
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    public event PropertyChangedEventHandler? PropertyChanged = null!;
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -110,8 +110,8 @@ public partial class MainWindow : RibbonWindow, INotifyPropertyChanged
     #region GL
 
     //private MagnetismManager manager;
-    private Function2D num_func;
-    private FunctionCell2D cell_func;
+    private Function2D num_func = null!;
+    private FunctionCell2D cell_func = null!;
     private PlotManager plotManager = PlotManager.Instance;
     private void gl_Loaded(object sender, RoutedEventArgs e)
     {

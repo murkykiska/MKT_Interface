@@ -1,59 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MKT_Interface.Models
+namespace MKT_Interface.Models;
+
+public class Area : INotifyPropertyChanged
 {
-    public class Area : INotifyPropertyChanged
+    private int intervalXNum;
+    public int IntervalXNum
     {
-        private int intervalXNum;
-        public int IntervalXNum
+        get { return intervalXNum; }
+        set
         {
-            get { return intervalXNum; }
-            set
-            {
-                intervalXNum = value;
-                OnPropertyChanged();
-            }
+            intervalXNum = value;
+            OnPropertyChanged();
         }
-        private int intervalZNum;
-        public int IntervalZNum
+    }
+    private int intervalZNum;
+    public int IntervalZNum
+    {
+        get { return intervalZNum; }
+        set
         {
-            get { return intervalZNum; }
-            set
-            {
-                intervalZNum = value;
-                OnPropertyChanged();
-            }
+            intervalZNum = value;
+            OnPropertyChanged();
         }
-        private double pX;
-        public double PX
+    }
+    private double pX;
+    public double PX
+    {
+        get { return pX; }
+        set 
+        { 
+            pX = value; 
+            OnPropertyChanged(); 
+        }
+    }
+    private double pZ;
+    public double PZ
+    {
+        get { return pZ; }
+        set
         {
-            get { return pX; }
-            set 
-            { 
-                pX = value; 
-                OnPropertyChanged(); 
-            }
+            pZ = value;
+            OnPropertyChanged();
         }
-        private double pZ;
-        public double PZ
-        {
-            get { return pZ; }
-            set
-            {
-                pZ = value;
-                OnPropertyChanged();
-            }
-        }
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    }
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

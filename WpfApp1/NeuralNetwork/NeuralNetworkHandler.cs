@@ -7,7 +7,6 @@ using Tensorflow.NumPy;
 using System.IO;
 namespace NeuralNetwork;
 
-
 public class NeuralNetworkHandler : IDisposable
 {
     Session session;
