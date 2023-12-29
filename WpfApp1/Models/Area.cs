@@ -25,26 +25,13 @@ public class Area : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    private double pX;
-    public double PX
+    private double pLength;
+    public double PLength
     {
-        get { return pX; }
-        set 
-        { 
-            pX = value; 
-            OnPropertyChanged(); 
-        }
+        get => pLength;
+        set { pLength = value; OnPropertyChanged(); }
     }
-    private double pZ;
-    public double PZ
-    {
-        get { return pZ; }
-        set
-        {
-            pZ = value;
-            OnPropertyChanged();
-        }
-    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

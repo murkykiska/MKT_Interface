@@ -1,64 +1,65 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using MKT_Interface.Magnetism;
 using MKT_Interface.Models;
-using MKT_Interface.ViewModels;
+using MKT_Interface.NeuralNetwork;
+using NeuralNetwork;
 using OpenTK.Mathematics;
 using Plot.Function;
-
 namespace WpfApp1.EM;
 
 public class MagnetismManager
 {
     Vector4d[] _data;
     Cell[] Cells;
-    public static void MakeDirect(string directtaskCfg, double leftX, double rightX, int i, string recsTxt)
+    EMForwardCalculator calculator = null!;
+    NeuralNetworkHandler nnHandler = null!;
+    private readonly EMParameters emParams;
+    private readonly NNParameters nnParams;
+
+    public MagnetismManager(EMParameters emParams, NNParameters nnParams, string model_path = "")
     {
-        string direct = "..\\..\\..\\EM\\direct.exe";
-        string dinfo = "..\\..\\..\\EM\\direct_info.txt";
+        calculator = new(emParams);
 
-        using (var s = new StreamWriter(dinfo))
-        {
-            s.WriteLine(directtaskCfg);
-            s.WriteLine(leftX);
-            s.WriteLine(rightX);
-            s.WriteLine(i);
-            s.WriteLine(recsTxt);
-        }
-
-        ProcessStartInfo info = new(direct, "./direct_info.txt");
-        info.CreateNoWindow = false;
-        info.WorkingDirectory = "./";
-        try
-        {
-            using Process? exeProcess = Process.Start(info);
-            exeProcess?.WaitForExit();
-        }
-        catch
-        {
-            throw new Exception("Pepega");
-        }
+        if (string.IsNullOrEmpty(model_path))
+            nnHandler = new(nnParams);
+        else 
+            nnHandler = new(nnParams, new StreamWriter(model_path));
+        this.emParams = emParams;
+        this.nnParams = nnParams;
     }
-    public static void MakeReverse(string directtaskCfg, string recsTxt, string ansTxt, double alpha)
+    public (float[] x, float[] Bx, float[] Bz) MakeDirect()
+    {
+        calculator.Calculate();
+        var Bxs = calculator.B.Select(x => (float)x.Bx).ToArray();
+        var Bzs = calculator.B.Select(x => (float)x.Bz).ToArray();
+        var xs = calculator.GetRecievers().Select(x => (float)x).ToArray();
+        return (xs, Bxs, Bzs);
+    }
+    public static void MakeReverse()
     {
         
     }
-    public void GetRecieverData(string recs_data)
-    {
-        using (BinaryReader r = new(File.Open(recs_data, FileMode.Open)))
-        {
-            int num = r.ReadInt32();
-            _data = new Vector4d[num];
-            for (int i = 0; i < num; i++)
-            {
-                _data[i] = (r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble());
-            }
 
-            _data = _data.OrderBy(_ => _.X).ToArray();
+
+    public (Box2[] boxCells, float[] values) GetBox2Cells()
+    {
+        var cells = emParams.Cells;
+
+        Box2[] boxCells = new Box2[cells.Count];
+        float[] values = new float[cells.Count];
+
+        for (int i = 0; i < boxCells.Length; i++)
+        {
+            boxCells[i].Min = ((float)cells[i].X0, (float)cells[i].Z0);
+            boxCells[i].Max = ((float)cells[i].X1, (float)cells[i].Z1);
+
+            values[i] = emParams.ShowPx ? (float)cells[i].PX : (float)cells[i].PZ;
         }
+
+        return (boxCells, values);
     }
-    public Function2D GetRecieversDataOnPlane(bool isX, float coord)
+    public Function2D MagnetismDataAsFunc2D(bool isX, float coord)
     {
         var data =
            from d in _data
@@ -66,7 +67,7 @@ public class MagnetismManager
            orderby isX ? d.X : d.Y
            select d;
 
-        var f = new Function2D();
+        var f = new Function2D(lineType: Function2D.LineTypes.Dashes);
 
         var d_ = data.ToArray();
         Vector2[] func = new Vector2[d_.Length];
@@ -79,7 +80,7 @@ public class MagnetismManager
         f.FillPoints(func);
         return f;
     }
-    public FunctionCell2D GetMagnetismData(bool isX)
+    public FunctionCell2D MagnetismDataAsFuncCells2D(bool isX)
     {
 
         Box2[] area = new Box2[Cells.Length];
@@ -93,20 +94,6 @@ public class MagnetismManager
 
         var f = new FunctionCell2D(area, vals);
         return f;
-    }
-    public void ReadCells(string path)
-    {
-        //int count;
-
-        //using (BinaryReader r = new BinaryReader(File.Open(path, FileMode.Open)))
-        //{
-        //    count = r.ReadInt32();
-        //    Cells = new Cell[count];
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        Cells[i] = new Cell(r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble(), r.ReadDouble());
-        //    }
-        //}1
     }
 
 }

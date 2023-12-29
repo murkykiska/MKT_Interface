@@ -71,8 +71,8 @@ public class Axis
 
         if (!_isShaderInitialized)
         {
-            _shader = new ShaderProgram(new[] { @"Plot/Viewport/Shaders/axis.frag", @"Plot/Viewport/Shaders/axis.vert" },
-               new[] { ShaderType.FragmentShader, ShaderType.VertexShader });
+            _shader = new ShaderProgram([@"Plot/Viewport/Shaders/axis.frag", @"Plot/Viewport/Shaders/axis.vert"],
+               [ShaderType.FragmentShader, ShaderType.VertexShader]);
             _shader.LinkShaders();
             _isShaderInitialized = true;
         }
@@ -168,17 +168,22 @@ public class Axis
 
             if (k % 10 != 0)
                 u /= 1.5f;
-            _ticks[i]     = _pos == Position.Horizontal ? _p0 + k * v : _axis_position;     // x // \ point on axis
+            _ticks[i] = _pos == Position.Horizontal ? _p0 + k * v : _axis_position;     // x // \ point on axis
             _ticks[i + 1] = _pos == Position.Horizontal ? _axis_position : _p0 + k * v;     // y // / point on axis
             _ticks[i + 2] = _pos == Position.Horizontal ? _p0 + k * v : _axis_position - u; // x
             _ticks[i + 3] = _pos == Position.Horizontal ? _axis_position - u : _p0 + k * v; // y
         }
 
+        UpdateText();
+    }
+
+    public void UpdateText()
+    {
         float dx = (Range.X1 - Range.X0) / ((float)_texts.Length - 1);
         for (int i = 0; i < _texts.Length; i++)
         {
             float ix = Range.X0 + dx * i;
-            _texts[i].SetText(ix.ToString("g4"));
+            _texts[i].SetText(ix.ToString("g2"));
         }
     }
 }

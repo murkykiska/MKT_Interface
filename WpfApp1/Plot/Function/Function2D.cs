@@ -15,9 +15,14 @@ public class Function2D : IFunction
     private static bool _shaderInitialized = false;
     public IEnumerable<Vector2> Points => _points.OrderBy(p => p.X);
 
-    public Function2D()
+    public enum LineTypes
     {
-
+        Continious,
+        Dashes
+    }
+    public Function2D(LineTypes lineType)
+    {
+        LineType = lineType;
     }
     public Box2 Domain
     {
@@ -32,6 +37,8 @@ public class Function2D : IFunction
             return new Box2 { Min = (_points[0].X, pointsByY[0].Y), Max = (_points[^1].X, pointsByY[^1].Y) };
         }
     }
+
+    public LineTypes LineType { get; }
 
     public void FillPoints(float[] x, float[] y)
     {
@@ -56,8 +63,8 @@ public class Function2D : IFunction
         if (!_shaderInitialized)
         {
             _shaderInitialized = true;
-            _shader = new ShaderProgram(new[] { @"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag" },
-              new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
+            _shader = new ShaderProgram([@"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag"],
+                                        [ShaderType.VertexShader, ShaderType.FragmentShader]);
             _shader.LinkShaders();
 
         }
@@ -101,6 +108,16 @@ public class Function2D : IFunction
         _shader.SetVec4("color", ref color);
 
         GL.BindVertexArray(_vao);
-        GL.DrawArrays(PrimitiveType.Lines, 0, _points.Length);
+
+        switch (LineType)
+        {
+            case LineTypes.Continious:
+                GL.DrawArrays(PrimitiveType.LineStrip, 0, _points.Length);
+                break;
+            case LineTypes.Dashes:
+                GL.DrawArrays(PrimitiveType.Lines, 0, _points.Length);
+                break;
+        }
+
     }
 }

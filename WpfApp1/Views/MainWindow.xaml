@@ -8,9 +8,9 @@
                 mc:Ignorable="d"
                 xmlns:r="urn:fluent-ribbon"
                 Title="MainWindow" Height="800" Width="1200"
-                Name="MainWin"
-                d:DataContext="{Binding ElementName=MainWin, Path=ViewModel}">
-    <Grid>
+                Name="MainWin">
+
+		<Grid DataContext="{Binding ElementName=MainWin, Path=ViewModel}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
@@ -21,245 +21,182 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <r:Ribbon Grid.Row="0" Grid.ColumnSpan="2">
-            <r:RibbonTabItem Header="Прямая задача">
-                <r:RibbonGroupBox Header="Размеры">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+		<r:Ribbon Grid.Row="0" Grid.ColumnSpan="2" >
+			<r:RibbonTabItem Header="Параметры прямой задачи">
+				<r:RibbonGroupBox Header="Область">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+						<TextBlock Text="Min X" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.MinX, Mode=TwoWay}" Grid.Row="0" Grid.Column="1" Margin="10 10 0 0" Width="60" />
+						<TextBlock Text="Max X" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.MaxX, Mode=TwoWay}" Grid.Row="0" Grid.Column="3" Margin="10 10 0 0" Width="60"/>
 
-                        <TextBlock Text="Min X" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding DirectTask.MinX, Mode=TwoWay}" Grid.Row="0" Grid.Column="1" Margin="10 10 0 0" Width="60" />
-                        <TextBlock Text="Max X" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding DirectTask.MaxX, Mode=TwoWay}" Grid.Row="0" Grid.Column="3" Margin="10 10 0 0" Width="60"/>
+						<TextBlock Text="Min Z" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.MinZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="10 10 0 0" Width="60"/>
+						<TextBlock Text="Max Z" Grid.Row="1" Grid.Column="2" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.MaxZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="3" Margin="10 10 0 0" Width="60"/>
 
-                        <TextBlock Text="Min Z" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding DirectTask.MinZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="10 10 0 0" Width="60"/>
-                        <TextBlock Text="Max Z" Grid.Row="1" Grid.Column="2" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding DirectTask.MinZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="3" Margin="10 10 0 0" Width="60"/>
+					</Grid>
+				</r:RibbonGroupBox>
 
-                    </Grid>
-                </r:RibbonGroupBox>
-                
-                <r:RibbonGroupBox Header="Интервалы по оси X">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+				<r:RibbonGroupBox Header="Интервалы по оси X">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <DataGrid x:Name="directxIntervals" Grid.Row="0" Grid.RowSpan="2" Height="70"
+						<DataGrid x:Name="directxIntervals" Grid.Row="0" Grid.RowSpan="2" Height="70"
                                   AutoGenerateColumns="False"
-                                  ItemsSource="{Binding DirectTask.XIntervals}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Разбиение" Width="100" Binding="{Binding IntervalsCount, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="Коэф. разрядки" Width="100" Binding="{Binding SparseRatio, Mode=TwoWay}"/>
-                            </DataGrid.Columns>                            
-                        </DataGrid>
-                    </Grid>
-                </r:RibbonGroupBox>
-                <r:RibbonGroupBox Header="Интервалы по оси Z">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                                  ItemsSource="{Binding EMParams.XIntervals}">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="Разбиение" Width="100" Binding="{Binding IntervalsCount, Mode=TwoWay}"/>
+								<DataGridTextColumn Header="Коэф. разрядки" Width="100" Binding="{Binding SparseRatio, Mode=TwoWay}"/>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</r:RibbonGroupBox>
+				<r:RibbonGroupBox Header="Интервалы по оси Z">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
 
-                        <DataGrid x:Name="directzIntervals" Grid.Row="0" Height="70"
+						<DataGrid x:Name="directzIntervals" Grid.Row="0" Height="70"
                                   AutoGenerateColumns="False"
-                                  ItemsSource="{Binding DirectTask.ZIntervals}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Разбиение" Width="100" Binding="{Binding IntervalsCount, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="Коэф. разрядки" Width="100" Binding="{Binding SparseRatio, Mode=TwoWay}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </r:RibbonGroupBox>
+                                  ItemsSource="{Binding EMParams.ZIntervals}">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="Разбиение" Width="100" Binding="{Binding IntervalsCount, Mode=TwoWay}"/>
+								<DataGridTextColumn Header="Коэф. разрядки" Width="100" Binding="{Binding SparseRatio, Mode=TwoWay}"/>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</r:RibbonGroupBox>
 
-                <r:RibbonGroupBox Header="Подобласти">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+				<r:RibbonGroupBox Header="Подобласти">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
 
-                        <DataGrid x:Name="directAreas" Grid.Row="0" Height="70"
+						<DataGrid x:Name="directAreas" Grid.Row="0" Height="70"
                                   AutoGenerateColumns="False"
-                                  ItemsSource="{Binding DirectTask.Areas}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="IntervalXNum" Width="100" Binding="{Binding IntervalXNum, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="IntervalZNum" Width="100" Binding="{Binding IntervalZNum, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="pX" Width="100" Binding="{Binding PX, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="pZ" Width="100" Binding="{Binding PZ, Mode=TwoWay}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </r:RibbonGroupBox>
-                <r:RibbonGroupBox>
-                    <r:Button Header="Create CFG" x:Name="createDirectCFG" Width="50" Click="createDirectCFG_Click"/>
-                </r:RibbonGroupBox>
-                
-            </r:RibbonTabItem>
-            <r:RibbonTabItem Header="Обратная задача">
-                <r:RibbonGroupBox Header="Размеры">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                                  ItemsSource="{Binding EMParams.Areas}">
+							<DataGrid.Columns>
+								<DataGridTextColumn Width="auto" Header="№ интервала на x" Binding="{Binding IntervalXNum, Mode=TwoWay}"/>
+								<DataGridTextColumn Width="auto" Header="№ интервала на z" Binding="{Binding IntervalZNum, Mode=TwoWay}"/>
+								<DataGridTextColumn Header="|P|" Width="100" Binding="{Binding PLength, Mode=TwoWay}"/>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</r:RibbonGroupBox>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+				<r:RibbonGroupBox Header="Намагниченность">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition/>
+							<RowDefinition/>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Min X" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding ReverseTask.MinX, Mode=TwoWay}" Grid.Row="0" Grid.Column="1" Margin="10 10 0 0" Width="60"/>
-                        <TextBlock Text="Max X" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding ReverseTask.MaxX, Mode=TwoWay}" Grid.Row="0" Grid.Column="3" Margin="10 10 0 0" Width="60"/>
+						<TextBlock Text="Px" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.PX, Mode=TwoWay}" Grid.Row="0" Grid.Column="1" Margin="10 10 10 0" Width="60" />
+						<TextBlock Text="Pz" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.PZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="10 10 10 0" Width="60" />
 
-                        <TextBlock Text="Min Z" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding ReverseTask.MinZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="10 10 0 0" Width="60"/>
-                        <TextBlock Text="Max Z" Grid.Row="1" Grid.Column="2" Margin="10 10 0 0" />
-                        <TextBox Text="{Binding ReverseTask.MaxZ, Mode=TwoWay}" Grid.Row="1" Grid.Column="3" Margin="10 10 0 0" Width="60"/>
+					</Grid>
+				</r:RibbonGroupBox>
+			</r:RibbonTabItem>
 
-                    </Grid>
-                </r:RibbonGroupBox>
+			<r:RibbonTabItem Header="Параметры магниторазведки">
+				<r:RibbonGroupBox Header="Параметры приемной линии">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
 
-                <r:RibbonGroupBox Header="Интервалы по оси X">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+						<TextBlock Text="Начало" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.RecX0, Mode=TwoWay}" x:Name="receiverBegX" Grid.Row="0" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
+						<TextBlock Text="Конец" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.RecX1, Mode=TwoWay}" x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
+						<TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.RecCount, Mode=TwoWay}" x:Name="receiverCount" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
+						<TextBlock Text="Ток в амперах" Grid.Row="1" Grid.Column="2" Margin="10 10 0 0" />
+						<r:TextBox Text="{Binding EMParams.Current, Mode=TwoWay}" x:Name="Current" Grid.Row="1" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
+					</Grid>
+				</r:RibbonGroupBox>
+				<r:RibbonGroupBox HorizontalContentAlignment="Center">
+					
+					<r:CheckBox Header="Показывать Px вместо Pz?" IsChecked="{Binding EMParams.ShowPx}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+				</r:RibbonGroupBox>
+				<r:RibbonGroupBox>
+					<r:Button Header="Расчет прямой задачи" x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 10 0" Click="EnterRecievers_Click"/>
+				</r:RibbonGroupBox>
+			</r:RibbonTabItem>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+			<r:RibbonTabItem Header="Обратная задача">
+				<r:RibbonGroupBox>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition/>
+							<RowDefinition/>
+						</Grid.RowDefinitions>
 
-                        <DataGrid x:Name="reversexIntervals" Grid.Row="0" Grid.RowSpan="2" Height="70"
-                                  AutoGenerateColumns="False"
-                                  ItemsSource="{Binding ReverseTask.XIntervals}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Разбиение" Width="100" Binding="{Binding IntervalsCount, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="Коэф. разрядки" Width="100" Binding="{Binding SparseRatio, Mode=TwoWay}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </r:RibbonGroupBox>
-                <r:RibbonGroupBox Header="Интервалы по оси Z">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <DataGrid x:Name="reversezIntervals" Grid.Row="0" Height="70"
-                                  AutoGenerateColumns="False"
-                                  ItemsSource="{Binding DirectTask.ZIntervals}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Разбиение" Width="100" Binding="{Binding IntervalsCount, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="Коэф. разрядки" Width="100" Binding="{Binding SparseRatio, Mode=TwoWay}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </r:RibbonGroupBox>
-
-                <r:RibbonGroupBox Header="Подобласти">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <DataGrid x:Name="reverseAreas" Grid.Row="0" Height="70"
-                                  AutoGenerateColumns="False"
-                                  ItemsSource="{Binding ReverseTask.Areas}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="IntervalXNum" Width="100" Binding="{Binding IntervalXNum, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="IntervalZNum" Width="100" Binding="{Binding IntervalZNum, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="pX" Width="100" Binding="{Binding PX, Mode=TwoWay}"/>
-                                <DataGridTextColumn Header="pZ" Width="100" Binding="{Binding PZ, Mode=TwoWay}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </r:RibbonGroupBox>
-                <r:RibbonGroupBox>
-                    <r:Button Header="Load DirectTask values" x:Name="LoadDirectTaskValues" Width="50" Click="LoadDirectTaskValues_Click"/>
-                    <r:Button Header="Create CFG" x:Name="createReverseCFG" Width="50" Click="createReverseCFG_Click"/>
-                </r:RibbonGroupBox>
-                <r:RibbonGroupBox Header="Регуляризация">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="Alpha" Grid.Column="0" Margin="10" />
-                        <r:TextBox x:Name="Alpha" Grid.Column="1" Margin="10" Width="70"/>
-                    </Grid>
-                </r:RibbonGroupBox>
-            </r:RibbonTabItem>
-            <r:RibbonTabItem Header="Приемники">
-                <r:RibbonGroupBox Header="Параметры приемной линии">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Начало" Grid.Row="0" Grid.Column="0" Margin="10 10 0 0" />
-                        <r:TextBox x:Name="receiverBegX" Grid.Row="0" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
-                        <TextBlock Text="Конец" Grid.Row="1" Grid.Column="0" Margin="10 10 0 0" />
-                        <r:TextBox x:Name="receiverEndX" Grid.Row="1" Grid.Column="1" Width ="60" Margin="10 10 0 0" />
-                        <TextBlock Text="Количество приемников" Grid.Row="0" Grid.Column="2" Margin="10 10 0 0" />
-                        <r:TextBox x:Name="receiverCount" Grid.Row="0" Grid.Column="3" Width ="60" Margin="10 10 0 0" />
-                    </Grid>
-                </r:RibbonGroupBox>
-                <r:RibbonGroupBox>
-                    <r:Button Header="Расчет прямой задачи" x:Name="EnterRecievers" Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Margin="10 10 0 0" Click="EnterRecievers_Click"/>
-                </r:RibbonGroupBox>
-            </r:RibbonTabItem>
-        </r:Ribbon>
+						<TextBlock Text="Скорость обучения" Margin="10 10 0 0" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<r:TextBox Text="{Binding NNParams.LearningRate, Mode=TwoWay}" Margin="10 10 0 0" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+						<TextBlock Text="Размер батча" Grid.Row="1" Margin="10 10 0 0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<r:TextBox Text="{Binding NNParams.BatchSize, Mode=TwoWay}" Margin="10 10 0 0" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+					</Grid>
+				</r:RibbonGroupBox>
+				
+				<r:RibbonGroupBox>
+					<r:Button x:Name="train" Header="Обучить модель" Width="70" Click="train_Click"/>
+				</r:RibbonGroupBox>
+				<r:RibbonGroupBox>
+					<r:Button x:Name="fit" Header="Рассчитать на модели" Width="70" Click="fit_Click" />
+				</r:RibbonGroupBox>
+			</r:RibbonTabItem>
+		</r:Ribbon>
 
 		<glWpfControl:GLWpfControl x:Name="gl" Grid.Row="1" Grid.Column="0" Margin="5,5,5,5" Render="gl_OnRender" MouseMove="Gl_OnMouseMove" Loaded="gl_Loaded" Unloaded="gl_Unloaded" SizeChanged="gl_SizeChanged"/>
 
-        <Grid Grid.Row="1" Grid.Column="1" Margin="10"
+      <Grid Grid.Row="1" Grid.Column="1" Margin="10"
               DataContext="{Binding ElementName=MainWin, Path=ViewModel.Palette}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50" />

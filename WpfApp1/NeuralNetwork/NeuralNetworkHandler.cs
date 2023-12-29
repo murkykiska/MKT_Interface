@@ -5,26 +5,27 @@ using Tensorflow.Keras.Engine;
 using System.Threading.Tasks;
 using Tensorflow.NumPy;
 using System.IO;
+using MKT_Interface.NeuralNetwork;
 namespace NeuralNetwork;
 
 public class NeuralNetworkHandler : IDisposable
 {
     Session session;
     IOptimizer optimizer;
-
-    public int Steps { get; }
-    public float LearningRate { get; }
-    public int DisplayStep { get; }
     Model model;
+    private readonly NNParameters parameters;
 
-    public NeuralNetworkHandler(int steps, float learningRate, int displayStep, TextWriter? output = null)
+    public int Steps => parameters.Steps;
+    public float LearningRate => (float)parameters.LearningRate;
+    public int DisplayStep => parameters.DisplaySteps;
+
+    public NeuralNetworkHandler(NNParameters parameters, TextWriter? output = null)
     {
+        this.parameters = parameters;
         tf_output_redirect = output;
+
         session = tf.Session();
-        optimizer = tf.keras.optimizers.SGD(learningRate);
-        Steps = steps;
-        LearningRate = learningRate;
-        DisplayStep = displayStep;
+        optimizer = tf.keras.optimizers.SGD(LearningRate);
     }
 
 

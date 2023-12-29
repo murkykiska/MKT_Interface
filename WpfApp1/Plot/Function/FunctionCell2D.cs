@@ -55,6 +55,8 @@ public class FunctionCell2D : IFunction
 
         _cells = cells;
         _values = values;
+
+        Prepare();
     }
 
     public void FillValues(float[] values)

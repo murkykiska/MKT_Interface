@@ -1,62 +1,56 @@
 ﻿using MKT_Interface.Models;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using MKT_Interface.NeuralNetwork;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace MKT_Interface.ViewModels
+namespace MKT_Interface.ViewModels;
+
+public class ViewModel : INotifyPropertyChanged
 {
-    public class ViewModel : INotifyPropertyChanged
+    private EMParameters emParams;
+    public EMParameters EMParams
     {
-        private Config directTask;
-        public Config DirectTask
+        get { return emParams; }
+        set
         {
-            get { return directTask; }
-            set
-            {
-                directTask = value;
-                OnPropertyChanged();
-            }
+            emParams = value;
+            OnPropertyChanged();
         }
-        private Config reverseTask;
-        public Config ReverseTask
+    }
+    private NNParameters nnParams;
+    public NNParameters NNParams
+    {
+        get { return nnParams; }
+        set
         {
-            get { return reverseTask; }
-            set
-            {
-                reverseTask = value;
-                OnPropertyChanged();
-            }
+            nnParams = value;
+            OnPropertyChanged();
         }
-        private Palette palette;
-        public Palette Palette
+    }
+    private Palette palette;
+    public Palette Palette
+    {
+        get { return palette; }
+        set
         {
-            get { return palette; }
-            set
-            {
-                palette = value;
-                OnPropertyChanged();
-            }
+            palette = value;
+            OnPropertyChanged();
         }
-        public void ReDrawPalette(double minValue, double maxValue, Color color1, Color color2)
-        {
-            Palette = new Palette(minValue, maxValue, color1, color2);
-        }
-        public ViewModel()
-        {
-            DirectTask = new Config();
-            ReverseTask = new Config();
-            Palette = new Palette(-100, 100, Colors.LightBlue, Colors.DarkViolet);
-        }
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    }
+    public void ReDrawPalette(double minValue, double maxValue, Color color1, Color color2)
+    {
+        Palette = new Palette(minValue, maxValue, color1, color2);
+    }
+    public ViewModel()
+    {
+        EMParams = new EMParameters();
+        NNParams = new NNParameters();
+        Palette = new Palette(-100, 100, Colors.LightBlue, Colors.DarkViolet);
+    }
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -30,8 +30,8 @@ public class PlotView
     {
         if (!_shaderInitialized)
         {
-            _shader = new ShaderProgram(new[] { @"Plot/Viewport/Shaders/plotbox.vert", @"Plot/Viewport/Shaders/plotbox.frag" },
-                                        new[] { ShaderType.VertexShader, ShaderType.FragmentShader });
+            _shader = new ShaderProgram([@"Plot/Viewport/Shaders/plotbox.vert", @"Plot/Viewport/Shaders/plotbox.frag"],
+                                        [ShaderType.VertexShader, ShaderType.FragmentShader]);
             _shader.LinkShaders();
             _shaderInitialized = true;
         }
@@ -64,11 +64,11 @@ public class PlotView
             CharXSpacing = 6
         };
 
-        _axisNames = new[]
-        {
+        _axisNames =
+        [
             new Text(xAxisName, axistparams),
             new Text(yAxisName, axistparams)
-        };
+        ];
 
     }
     private (int x0, int x1, int y0, int y1) _plotBox;
@@ -78,6 +78,11 @@ public class PlotView
         _plotBox.x1 = DrawArea.Max.X - _margin.x1 * 2;
         _plotBox.y0 = DrawArea.Min.Y + _margin.y0 + _yAxis.Width;
         _plotBox.y1 = DrawArea.Max.Y - _margin.y1 * 2;
+
+        _xAxis.Range = XRange;
+        _yAxis.Range = YRange;
+        _xAxis.UpdateText();
+        _yAxis.UpdateText();
     }
     public void DrawPlotView(Vector2i ViewportSize)
     {
