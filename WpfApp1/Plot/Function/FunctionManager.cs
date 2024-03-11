@@ -35,7 +35,7 @@ public sealed class FunctionManager
     {
        foreach (var function in _functions)
        {
-          function.Draw(_colors[function], DrawArea);
+          function.Draw(_colors[function], DrawArea, null);
        }
 
     }

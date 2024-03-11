@@ -8,6 +8,8 @@ namespace MKT_Interface.Models;
 
 public class EMParameters : INotifyPropertyChanged
 {
+    public class DoubleHandler(double _value) { public double Value { get => _value; set => _value = value; } };
+
     private ObservableCollection<Interval> xIntervals = 
     [
         new Interval() { IntervalsCount = 10, SparseRatio = 1 },
@@ -50,62 +52,22 @@ public class EMParameters : INotifyPropertyChanged
         }
     }
 
-    private ObservableCollection<double> internalPtsX = [];
+    private ObservableCollection<DoubleHandler> internalPtsX = [new(- 500d), new(-100d), new(100d), new(500d)];
 
-    public ObservableCollection<double> InternalPtsX
+    public ObservableCollection<DoubleHandler> InternalPtsX
     {
         get => internalPtsX;
         set { internalPtsX = value; OnPropertyChanged(); }
     }
 
-    private ObservableCollection<double> internalPtsZ = [];
+    private ObservableCollection<DoubleHandler> internalPtsZ = [new(-500d),new(-200d), new(-100d), new(0d)];
 
-    public ObservableCollection<double> InternalPtsZ
+    public ObservableCollection<DoubleHandler> InternalPtsZ
     {
         get => internalPtsZ;
         set { internalPtsZ = value; OnPropertyChanged(); }
     }
 
-    private double minX = -100;
-    public double MinX
-    {
-        get => minX;
-        set
-        {
-            minX = value;
-            OnPropertyChanged();
-        }
-    }
-    private double maxX = 100;
-    public double MaxX
-    {
-        get => maxX;
-        set
-        {
-            maxX = value;
-            OnPropertyChanged();
-        }
-    }
-    private double minZ = -200;
-    public double MinZ
-    {
-        get => minZ;
-        set
-        {
-            minZ = value;
-            OnPropertyChanged();
-        }
-    }
-    private double maxZ = -100;
-    public double MaxZ
-    {
-        get => maxZ;
-        set
-        {
-            maxZ = value;
-            OnPropertyChanged();
-        }
-    }
     private double current = 100;
     public double Current
     {
@@ -116,19 +78,19 @@ public class EMParameters : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    private double recX0 = -100;
+    private double recX0 = -1000;
     public double RecX0
     {
         get => recX0;
         set { recX0 = value; OnPropertyChanged(); }
     }
-    private double recX1 = 100;
+    private double recX1 = 1000;
     public double RecX1
     {
         get { return recX1; }
         set { recX1 = value; OnPropertyChanged(); }
     }
-    private int recCount = 50;
+    private int recCount = 100;
     public int RecCount
     {
         get { return recCount; }
@@ -173,10 +135,11 @@ public class EMParameters : INotifyPropertyChanged
     List<Cell> cells;
     public List<Cell> Cells
     {
+      set => cells = value;
         get {
             cells = new List<Cell>();
-            var xs = GetAllAxisPoints(XIntervals, MinX, MaxX);
-            var zs = GetAllAxisPoints(ZIntervals, MinZ, MaxZ);
+            var xs = GetAllAxisPoints(XIntervals, InternalPtsX);
+            var zs = GetAllAxisPoints(ZIntervals, InternalPtsZ);
 
             for (int ix = 0; ix < xs.Count - 1; ix++)
             {
@@ -189,20 +152,21 @@ public class EMParameters : INotifyPropertyChanged
                     double length = plength;
                     bool found = false;
                     Area foundArea = null;
+
                     foreach (var area in Areas)
                     {
-                        if (found) break;
-                        double hx = (maxX - minX) / XIntervals.Count;
-                        double areax0 = minX + area.IntervalXNum * hx;
-                        double areax1 = minX + (area.IntervalXNum + 1) * hx;
+                        double xl = internalPtsX[area.IntervalXNum].Value, 
+                               xr = internalPtsX[area.IntervalXNum+1].Value, 
+                               zl = internalPtsZ[area.IntervalZNum].Value, 
+                               zr = internalPtsZ[area.IntervalZNum+1].Value;
 
-                        double hz = (maxZ - minZ) / ZIntervals.Count;
-                        double areaz0 = minZ + area.IntervalZNum * hz;
-                        double areaz1 = minZ + (area.IntervalZNum + 1) * hz;
+                        if (found) break;
 
                         foundArea = area;
-                        found = areax0 < cx && cx < areax1 && areaz0 < cz && cz < areaz1;
+                        found = xl < cx && cx < xr && 
+                                zl < cz && cz < zr;
                     }
+
                     if (found) length = foundArea?.PLength ?? 1d;
                     (double x, double z) p = (length * pX, length * pZ);
 
@@ -215,34 +179,33 @@ public class EMParameters : INotifyPropertyChanged
         }
     }
 
-    List<double> GetAllAxisPoints(ObservableCollection<Interval> intervals, double min, double max)
+    List<double> GetAllAxisPoints(ObservableCollection<Interval> intervals, ObservableCollection<DoubleHandler> points)
     {
-        List<double> points = new();
-
+        List<double> allPoints = [points[0].Value];
 
         for (int i = 0; i < intervals.Count; i++)
         {
             var intx = intervals[i];
 
-            double xl = min + i * hx;
-            double xr = 
-            double hx = (xl - xr) / (intervals.Count);
+            double xl = points[i].Value;
+            double xr = points[i + 1].Value;
+
+            double hx = (xr - xl) ;
             double x0 = xl;
             bool isRegular = Abs(intx.SparseRatio - 1d) < 1e-13;
 
             double bx = isRegular ?
-                hx / intx.IntervalsCount :
-                hx * (1d - intx.SparseRatio) / (1d - Pow(intx.SparseRatio, intx.IntervalsCount));
+                hx / intx.IntervalsCount : hx * (1d - intx.SparseRatio) / (1d - Pow(intx.SparseRatio, intx.IntervalsCount));
 
             for (int ix = 0; ix < intx.IntervalsCount; ix++)
             {
-                points.Add(x0);
                 double scale = isRegular ? 1d : Pow(intx.SparseRatio, ix);
-
                 x0 += bx * scale;
+                
+                allPoints.Add(x0);
             }
         }
-        points.Add(max);
-        return points;
+
+        return allPoints;
     }
 }

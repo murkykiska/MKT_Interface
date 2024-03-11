@@ -9,115 +9,144 @@ namespace Plot.Function;
 
 public class Function2D : IFunction
 {
-    private int _vao = 0, _vbo = 0;
-    private Vector2[] _points = null!;
-    private static ShaderProgram _shader = null!;
-    private static bool _shaderInitialized = false;
-    public IEnumerable<Vector2> Points => _points.OrderBy(p => p.X);
+   private int _vao = 0, _vbo = 0;
+   private Vector2[] _points = null!;
+   private static ShaderProgram _shader = null!;
+   private static bool _shaderInitialized = false;
+   public IEnumerable<Vector2> Points => _points.OrderBy(p => p.X);
 
-    public enum LineTypes
-    {
-        Continious,
-        Dashes
-    }
-    public Function2D(LineTypes lineType)
-    {
-        LineType = lineType;
-    }
-    public Box2 Domain
-    {
-        get
-        {
-            if (_points == null)
-                throw new Exception("Function2D was not defined!");
+   public enum LineTypes
+   {
+      Continious,
+      Dashed
+   }
+   public Function2D(LineTypes lineType)
+   {
+      LineType = lineType;
+   }
+   public Box2 Domain
+   {
+      get
+      {
+         if (_points == null)
+            throw new Exception("Function2D was not defined!");
 
-            _points = _points.OrderBy(p => p.X).ToArray();
-            var pointsByY = _points.OrderBy(p => p.Y).ToArray();
+         _points = _points.OrderBy(p => p.X).ToArray();
+         var pointsByY = _points.OrderBy(p => p.Y).ToArray();
 
-            return new Box2 { Min = (_points[0].X, pointsByY[0].Y), Max = (_points[^1].X, pointsByY[^1].Y) };
-        }
-    }
+         return new Box2 { Min = (_points[0].X, pointsByY[0].Y), Max = (_points[^1].X, pointsByY[^1].Y) };
+      }
+   }
 
-    public LineTypes LineType { get; }
+   public LineTypes LineType { get; }
 
-    public void FillPoints(float[] x, float[] y)
-    {
-        if (x == null || y == null)
-            throw new Exception($"Point set {(x == null ? nameof(x) : nameof(y)).ToUpper()} was empty!");
-        if (x.Length != y.Length)
-            throw new Exception("Length of set X was not equal to length of set Y");
+   public void FillPoints(float[] x, float[] y)
+   {
+      if (x == null || y == null)
+         throw new Exception($"Point set {(x == null ? nameof(x) : nameof(y)).ToUpper()} was empty!");
+      if (x.Length != y.Length)
+         throw new Exception("Length of set X was not equal to length of set Y");
 
-        _points = new Vector2[x.Length];
-        for (int i = 0; i < x.Length; i++)
-            _points[i] = (x[i], y[i]);
+      _points = new Vector2[x.Length];
+      for (int i = 0; i < x.Length; i++)
+         _points[i] = (x[i], y[i]);
 
-    }
+   }
 
-    public void FillPoints(Vector2[] points)
-    {
-        _points = points;
-    }
+   public void FillPoints(Vector2[] points)
+   {
+      _points = points;
+   }
 
-    public void Prepare()
-    {
-        if (!_shaderInitialized)
-        {
-            _shaderInitialized = true;
-            _shader = new ShaderProgram([@"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag"],
-                                        [ShaderType.VertexShader, ShaderType.FragmentShader]);
-            _shader.LinkShaders();
+   public void Prepare()
+   {
+      if (!_shaderInitialized)
+      {
+         _shaderInitialized = true;
+         _shader = new ShaderProgram([@"Plot/Function/Shaders/func.vert", @"Plot/Function/Shaders/func.frag"],
+                                     [ShaderType.VertexShader, ShaderType.FragmentShader]);
+         _shader.LinkShaders();
 
-        }
+      }
 
-        float[] pointsFloats = new float[2 * _points.Length];
-        for (int i = 0; i < _points.Length * 2; i += 2)
-        {
-            pointsFloats[i] = _points[i / 2].X;
-            pointsFloats[i + 1] = _points[i / 2].Y;
-        }
+      float[] pointsFloats = new float[2 * _points.Length];
+      for (int i = 0; i < _points.Length * 2; i += 2)
+      {
+         pointsFloats[i] = _points[i / 2].X;
+         pointsFloats[i + 1] = _points[i / 2].Y;
+      }
 
-        if (_vao == 0)
-            _vao = GL.GenVertexArray();
-        GL.BindVertexArray(_vao);
+      if (_vao == 0)
+         _vao = GL.GenVertexArray();
+      GL.BindVertexArray(_vao);
 
-        if (_vbo == 0)
-            _vbo = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+      if (_vbo == 0)
+         _vbo = GL.GenBuffer();
+      GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, pointsFloats.Length * sizeof(float), pointsFloats, BufferUsageHint.StreamDraw);
+      GL.BufferData(BufferTarget.ArrayBuffer, pointsFloats.Length * sizeof(float), pointsFloats, BufferUsageHint.StreamDraw);
 
-        GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
-        GL.EnableVertexAttribArray(0);
+      GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+      GL.EnableVertexAttribArray(0);
 
-        GL.BindVertexArray(0);
+      GL.BindVertexArray(0);
 
-        GL.GetFloat(GetPName.AliasedLineWidthRange, new float[] { 2, 10 });
+      GL.GetFloat(GetPName.AliasedLineWidthRange, [2, 10]);
 
-    }
-    public void Draw(Color4 color, Box2 drawArea)
-    {
-        Vector2 Skew = drawArea.Size / Domain.Size;
+   }
+   public static Box2 Draw2Funcs(Box2 DrawArea, Function2D func1, Function2D func2, Color4 color1, Color4 color2)
+   {
+      ((float sx0, float sy0), (float sx1, float sy1)) = (func1.Domain.Min, func1.Domain.Max);
+      ((float x0, float y0), (float x1, float y1)) = (func2.Domain.Min, func2.Domain.Max);
 
-        _shader.UseShaders();
-        var ortho = Camera2D.Instance.GetOrthoMatrix();
-        var model = Matrix4.CreateScale(Skew.X, Skew.Y, 1) *
-                    Matrix4.CreateTranslation(-Domain.Center.X * Skew.X, -Domain.Center.Y * Skew.Y, 0);
+      Box2 full = new(MathF.Min(sx0, x0), MathF.Min(sy0, y0), MathF.Max(sx1, x1), MathF.Max(sy1, y1));
 
-        _shader.SetMatrix4("projection", ref ortho);
-        _shader.SetMatrix4("model", ref model);
-        _shader.SetVec4("color", ref color);
+      Vector2 h = full.Max - full.Min;
+      Vector2 ts0 = (func1.Domain.Min - full.Min) / h;
+      Vector2 ts1 = (func1.Domain.Max - full.Min) / h;
 
-        GL.BindVertexArray(_vao);
+      Vector2 t0 = (func2.Domain.Min - full.Min) / h;
+      Vector2 t1 = (func2.Domain.Max - full.Min) / h;
 
-        switch (LineType)
-        {
-            case LineTypes.Continious:
-                GL.DrawArrays(PrimitiveType.LineStrip, 0, _points.Length);
-                break;
-            case LineTypes.Dashes:
-                GL.DrawArrays(PrimitiveType.Lines, 0, _points.Length);
-                break;
-        }
+      Box2 srelativeArea = new(DrawArea.Min + ts0 * DrawArea.Size,
+                               DrawArea.Min + ts1 * DrawArea.Size); //new(DrawArea.Min * sd, DrawArea.Max * sd);
 
-    }
+      Box2 relativeArea = new(DrawArea.Min + t0 * DrawArea.Size,
+                              DrawArea.Min + t1 * DrawArea.Size);//new(DrawArea.Min * d, DrawArea.Max * d);
+
+      Vector2 ts = (DrawArea.Center - DrawArea.Min) / DrawArea.Size;
+      Vector2? shift = full.Min + ts * full.Size;
+
+      func1?.Draw(color1, srelativeArea, shift);
+      func2?.Draw(color2, relativeArea, shift);
+      return full;
+   }
+   public void Draw(Color4 color, Box2 drawArea, Vector2? shift = null)
+   {
+      Vector2 Skew = drawArea.Size / Domain.Size;
+      shift ??= Domain.Center;
+
+      _shader.UseShaders();
+      //Camera2D.Instance.Size = new Vector2i((int)drawArea.Size.X, (int)drawArea.Size.Y);
+      var ortho = Camera2D.Instance.GetOrthoMatrix();
+      var model = Matrix4.CreateScale(Skew.X, Skew.Y, 1) * 
+                  Matrix4.CreateTranslation(-shift.Value.X * Skew.X, -shift.Value.Y * Skew.Y, 0);
+
+      _shader.SetMatrix4("projection", ref ortho);
+      _shader.SetMatrix4("model", ref model);
+      _shader.SetVec4("color", ref color);
+
+      GL.BindVertexArray(_vao);
+
+      switch (LineType)
+      {
+         case LineTypes.Continious:
+            GL.DrawArrays(PrimitiveType.LineStrip, 0, _points.Length);
+            break;
+         case LineTypes.Dashed:
+            GL.DrawArrays(PrimitiveType.Lines, 0, _points.Length);
+            break;
+      }
+
+   }
 }

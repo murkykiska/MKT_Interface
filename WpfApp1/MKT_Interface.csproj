@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Fluent.Ribbon" Version="10.0.4" />
+    <PackageReference Include="Keras.NET" Version="3.8.5" />
     <PackageReference Include="OpenTK" Version="4.8.2" />
     <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.3" />
     <PackageReference Include="SciSharp.TensorFlow.Redist-Windows-GPU" Version="2.10.3" />
@@ -17,6 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="NeuralNetwork\Data\data.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NeuralNetwork\Models\model.model">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Plot\Function\Shaders\border.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -65,10 +72,6 @@
     <None Update="Plot\Viewport\Shaders\plotbox.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NeuralNetwork\Models\" />
   </ItemGroup>
 
 </Project>

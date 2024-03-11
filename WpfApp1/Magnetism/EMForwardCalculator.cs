@@ -1,11 +1,10 @@
 ﻿using MKT_Interface.Models;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Tensorflow;
 
 namespace MKT_Interface.Magnetism;
-using static GaussIntegrator;
 
 public class EMForwardCalculator
 {
@@ -17,18 +16,18 @@ public class EMForwardCalculator
         this.parameters = parameters;
         Init();
     }
-    class BParams : IFuncParams
+    class BParams
     {
         public EMParameters parameters { get; set; } = null!;
         public Cell Cell { get; set; } = null!;
         public double RecX { get; set; }
     }
 
-    public void Calculate()
+    public void Calculate(List<Cell> incells = null)
     {
         var recs = GetRecievers();
         B = new (double Bx, double Bz)[recs.Length];
-        var cells = parameters.Cells;
+        var cells = incells ?? parameters.Cells;
 
         for (int i = 0; i < B.Length; i++)
         {
@@ -65,15 +64,15 @@ public class EMForwardCalculator
         double lx = bParams.Cell.X0, rx = bParams.Cell.X1, lz = bParams.Cell.Z0, rz = bParams.Cell.Z1;
         double cx = (lx + rx) / 2d, cz = (lz + rz) / 2d;
 
-        double Bx = 0d;
-        double Bz = 0d; 
+        var (Bx, Bz) = (0d, 0d);
+
         for (int i = 0; i < 9; i++)
         {
             double hx = bParams.Cell.X1 - bParams.Cell.X0, hz = bParams.Cell.Z1 - bParams.Cell.Z0;
             double px = bParams.Cell.PX, pz = bParams.Cell.PZ;
 
             double I = bParams.parameters.Current;
-            (double x, double z) r = (bParams.RecX - (hx * gpoints[i].X + cx), -(hz * gpoints[i].Y + cz));
+            (double x, double z) r = (bParams.RecX - (hx * gpoints[i].X + cx), - (hz * gpoints[i].Y + cz));
 
             double r2 = r.x * r.x + r.z * r.z;
             double r3 = Math.Sqrt(r2) * r2;
@@ -90,12 +89,10 @@ public class EMForwardCalculator
 
     public void Save(string path)
     {
-        using (var save = new StreamWriter(path))
-        {
-            foreach (var b in B)
-                save.WriteLine($"{b.Bx}\t{b.Bz}");
-        }
-    }
+      using var save = new StreamWriter(path);
+      foreach (var (Bx, Bz) in B)
+         save.WriteLine($"{Bx}\t{Bz}");
+   }
 
     public double[] GetRecievers()
     {

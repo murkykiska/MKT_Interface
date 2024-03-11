@@ -101,14 +101,13 @@ public class Palette : INotifyPropertyChanged
     {
         double h = (maxValue - minValue) / 6;
 
-        Value1 = Math.Round(minValue, 0);
-        Value2 = Math.Round(minValue + h, 0);
-        Value3 = Math.Round(minValue + 2 * h, 0);
-        Value4 = Math.Round(minValue + 3 * h, 0);
-        Value5 = Math.Round(minValue + 4 * h, 0);
-        Value6 = Math.Round(minValue + 5 * h, 0);
-        Value7 = Math.Round(maxValue, 0);
-
+        Value1 = minValue;
+        Value2 = minValue + h;
+        Value3 = minValue + 2 * h;
+        Value4 = minValue + 3 * h;
+        Value5 = minValue + 4 * h;
+        Value6 = minValue + 5 * h;
+        Value7 = maxValue;
         Color1 = color1;
         Color2 = color2;
     }

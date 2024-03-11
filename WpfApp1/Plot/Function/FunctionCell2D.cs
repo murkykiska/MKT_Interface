@@ -217,7 +217,7 @@ public class FunctionCell2D : IFunction
     public Vector3 Color1 { get; set; }
     public Vector3 Color0 { get; set; }
 
-    public void Draw(Color4 color, Box2 drawArea)
+    public void Draw(Color4 color, Box2 drawArea, Vector2? shift = null)
     {
         // Cells
         Vector2 Skew = drawArea.Size / Domain.Size;

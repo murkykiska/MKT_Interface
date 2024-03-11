@@ -65,6 +65,7 @@ public class Cell : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+   public (double Cx, double Cz) Center => ((x0 + x1) / 2.0, (z0 + z1) / 2.0); 
     public Cell(double x0, double x1, double z0, double z1, double px, double pz)
     {
         X0 = x0;
